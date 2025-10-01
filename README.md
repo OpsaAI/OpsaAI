@@ -76,7 +76,7 @@ OpsaAI makes analyzing complex configuration files simple by providing:
 1. **Clone the Repository**
 
    ```bash
-   git clone https://github.com/51xDeveloper/OpsaAI.git
+   git clone https://github.com/OpsaAI/OpsaAI.git
    cd OpsaAI
    ```
 
