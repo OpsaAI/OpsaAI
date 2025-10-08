@@ -10,7 +10,7 @@ import { ChatMessage } from "@/components/chat-message"
 import { FileUpload } from "@/components/file-upload"
 import { Layout } from "@/components/layout"
 import { AuthWrapper } from "@/components/auth-wrapper"
-import { ArrowLeft, Send, MessageSquare, Upload, X, Plus, Brain, Zap, Menu } from "lucide-react"
+import { ArrowLeft, Send, MessageSquare, Upload, X, Plus, Brain, Zap, Menu, Settings, Search, Trash2, Edit3, Copy, Download, Star, MoreVertical, ChevronDown, ChevronUp } from "lucide-react"
 import Link from "next/link"
 
 interface Message {
@@ -44,11 +44,49 @@ export default function ChatPage() {
   const [currentSessionId, setCurrentSessionId] = useState<string | null>(null)
   const [sessionName, setSessionName] = useState("New Chat")
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [searchQuery, setSearchQuery] = useState("")
+  const [showSettings, setShowSettings] = useState(false)
+  const [isTyping, setIsTyping] = useState(false)
+  const [selectedSession, setSelectedSession] = useState<string | null>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
+  const chatContainerRef = useRef<HTMLDivElement>(null)
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
   }
+
+  const copyToClipboard = async (text: string) => {
+    try {
+      await navigator.clipboard.writeText(text)
+      // You could add a toast notification here
+    } catch (err) {
+      console.error('Failed to copy text: ', err)
+    }
+  }
+
+  const downloadChat = () => {
+    const chatData = {
+      sessionName,
+      messages,
+      uploadedFiles: uploadedFiles.map(f => ({ name: f.name, type: f.type })),
+      timestamp: new Date().toISOString()
+    }
+    
+    const blob = new Blob([JSON.stringify(chatData, null, 2)], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `${sessionName.replace(/[^a-z0-9]/gi, '_').toLowerCase()}_chat.json`
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
+  }
+
+  const filteredSessions = chatSessions.filter(session =>
+    session.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    session.lastMessage.toLowerCase().includes(searchQuery.toLowerCase())
+  )
 
   useEffect(() => {
     scrollToBottom()
@@ -187,6 +225,7 @@ export default function ChatPage() {
       setMessages((prev) => [...prev, errorMessage])
     } finally {
       setIsLoading(false)
+      setIsTyping(false)
     }
   }
 
@@ -215,6 +254,7 @@ export default function ChatPage() {
     setMessages((prev) => [...prev, userMessage])
     setInput("")
     setIsLoading(true)
+    setIsTyping(true)
 
     try {
       // Check if we have uploaded files to chat about
@@ -278,102 +318,159 @@ export default function ChatPage() {
       setMessages((prev) => [...prev, errorMessage])
     } finally {
       setIsLoading(false)
+      setIsTyping(false)
     }
   }
 
   return (
     <AuthWrapper>
       <Layout showBackground={false}>
-        <div className="h-screen flex">
+        <div className="h-screen flex bg-gradient-to-br from-background via-background to-muted/20">
           {/* Mobile Menu Button */}
           <Button
             variant="ghost"
             size="sm"
-            className="fixed top-4 left-4 z-20 md:hidden"
+            className="fixed top-4 left-4 z-20 md:hidden bg-background/80 backdrop-blur-sm border shadow-lg"
             onClick={() => setSidebarOpen(!sidebarOpen)}
             data-menu-button
           >
             <Menu className="w-4 h-4" />
           </Button>
 
-          {/* Fixed Sidebar */}
+          {/* Enhanced Fixed Sidebar */}
           <div 
-            className={`w-80 border-r border-border/40 bg-card/50 flex flex-col fixed left-0 top-0 h-full z-10 transition-transform duration-300 ${
+            className={`w-80 border-r border-border/40 bg-card/80 backdrop-blur-xl flex flex-col fixed left-0 top-0 h-full z-10 transition-all duration-300 shadow-xl ${
               sidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
             }`}
             data-sidebar
           >
-            {/* Chat Sessions */}
-            <div className="p-4 border-b border-border/40 flex-shrink-0">
-              <div className="flex items-center justify-between mb-3">
-                <h3 className="text-sm font-semibold">Chat History</h3>
-                <Button variant="ghost" size="sm" onClick={startNewChat}>
-                  <Plus className="w-4 h-4" />
-                </Button>
+            {/* Enhanced Header */}
+            <div className="p-4 border-b border-border/40 flex-shrink-0 bg-gradient-to-r from-primary/5 to-transparent">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center space-x-2">
+                  <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center">
+                    <Brain className="w-4 h-4 text-primary" />
+                  </div>
+                  <h3 className="text-sm font-semibold">Chat History</h3>
+                </div>
+                <div className="flex items-center space-x-1">
+                  <Button variant="ghost" size="sm" onClick={startNewChat} className="hover:bg-primary/10">
+                    <Plus className="w-4 h-4" />
+                  </Button>
+                  <Button variant="ghost" size="sm" onClick={() => setShowSettings(!showSettings)} className="hover:bg-primary/10">
+                    <Settings className="w-4 h-4" />
+                  </Button>
+                </div>
               </div>
-              <div className="space-y-1 max-h-32 overflow-y-auto">
-                {chatSessions.map((session) => (
-                  <button
-                    key={session.id}
-                    onClick={() => loadChatSession(session.id)}
-                    className={`w-full text-left p-2 rounded-md text-sm hover:bg-muted/50 transition-colors ${
-                      currentSessionId === session.id ? "bg-muted" : ""
-                    }`}
-                  >
-                    <div className="font-medium truncate">{session.name}</div>
-                    <div className="text-xs text-muted-foreground truncate">{session.lastMessage}</div>
-                  </button>
-                ))}
+              
+              {/* Search Bar */}
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <Input
+                  placeholder="Search chats..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-10 h-8 text-sm bg-background/50 border-border/50"
+                />
               </div>
             </div>
 
-            {/* Uploaded Files */}
-            <div className="flex-1 p-4 overflow-y-auto">
-              <div className="space-y-4">
-                <div>
-                  <h3 className="text-sm font-semibold mb-3">Uploaded Files</h3>
-                  {uploadedFiles.length === 0 ? (
-                    <p className="text-xs text-muted-foreground">
-                      No files uploaded yet. Upload infrastructure files to start asking questions about them.
-                    </p>
-                  ) : (
-                    <div className="space-y-2">
-                      {uploadedFiles.map((file, index) => (
-                        <div key={index} className="flex items-center justify-between p-2 bg-muted rounded-md">
-                          <div className="flex-1 min-w-0">
-                            <p className="text-xs font-medium truncate">{file.name}</p>
-                            <p className="text-xs text-muted-foreground">{file.type || "Unknown type"}</p>
+            {/* Enhanced Chat Sessions */}
+            <div className="flex-1 overflow-y-auto p-4">
+              <div className="space-y-2">
+                {filteredSessions.length === 0 ? (
+                  <div className="text-center py-8">
+                    <MessageSquare className="w-8 h-8 text-muted-foreground mx-auto mb-2" />
+                    <p className="text-xs text-muted-foreground">No chats found</p>
+                  </div>
+                ) : (
+                  filteredSessions.map((session) => (
+                    <div
+                      key={session.id}
+                      className={`group relative p-3 rounded-lg cursor-pointer transition-all duration-200 hover:bg-muted/50 ${
+                        currentSessionId === session.id ? "bg-primary/10 border border-primary/20" : "hover:shadow-sm"
+                      }`}
+                      onClick={() => loadChatSession(session.id)}
+                    >
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1 min-w-0">
+                          <div className="font-medium text-sm truncate mb-1">{session.name}</div>
+                          <div className="text-xs text-muted-foreground truncate">{session.lastMessage}</div>
+                          <div className="text-xs text-muted-foreground mt-1">
+                            {new Date(session.timestamp).toLocaleDateString()}
                           </div>
+                        </div>
+                        <div className="opacity-0 group-hover:opacity-100 transition-opacity flex items-center space-x-1">
+                          <Button variant="ghost" size="sm" className="h-6 w-6 p-0 hover:bg-destructive/10">
+                            <Trash2 className="w-3 h-3" />
+                          </Button>
+                          <Button variant="ghost" size="sm" className="h-6 w-6 p-0 hover:bg-primary/10">
+                            <Edit3 className="w-3 h-3" />
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+
+            {/* Enhanced File Upload Section */}
+            <div className="border-t border-border/40 p-4 bg-gradient-to-r from-transparent to-primary/5">
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-sm font-semibold flex items-center">
+                    <Upload className="w-4 h-4 mr-2" />
+                    Files
+                  </h3>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setShowFileUpload(!showFileUpload)}
+                    className="text-xs"
+                  >
+                    {showFileUpload ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+                  </Button>
+                </div>
+
+                {uploadedFiles.length > 0 && (
+                  <div className="space-y-2 max-h-32 overflow-y-auto">
+                    {uploadedFiles.map((file, index) => (
+                      <div key={index} className="flex items-center justify-between p-2 bg-muted/50 rounded-md group">
+                        <div className="flex-1 min-w-0">
+                          <p className="text-xs font-medium truncate">{file.name}</p>
+                          <p className="text-xs text-muted-foreground">{file.type || "Unknown type"}</p>
+                        </div>
+                        <div className="opacity-0 group-hover:opacity-100 transition-opacity flex items-center space-x-1">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => copyToClipboard(file.content)}
+                            className="h-6 w-6 p-0 hover:bg-primary/10"
+                          >
+                            <Copy className="w-3 h-3" />
+                          </Button>
                           <Button
                             variant="ghost"
                             size="sm"
                             onClick={() => removeFile(file.name)}
-                            className="ml-2 h-6 w-6 p-0"
+                            className="h-6 w-6 p-0 hover:bg-destructive/10"
                           >
                             <X className="w-3 h-3" />
                           </Button>
                         </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-
-                <div>
-                  <Button
-                    onClick={() => setShowFileUpload(!showFileUpload)}
-                    variant="outline"
-                    size="sm"
-                    className="w-full"
-                  >
-                    <Upload className="w-3 h-3 mr-2" />
-                    Upload File
-                  </Button>
-                </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
 
                 {showFileUpload && (
-                  <Card>
+                  <Card className="border-primary/20 bg-gradient-to-br from-primary/5 to-transparent">
                     <CardHeader className="pb-2">
-                      <CardTitle className="text-sm">Upload Infrastructure File</CardTitle>
+                      <CardTitle className="text-sm flex items-center">
+                        <Upload className="w-4 h-4 mr-2" />
+                        Upload Infrastructure File
+                      </CardTitle>
                     </CardHeader>
                     <CardContent className="pt-0">
                       <FileUpload onFileUpload={handleFileUpload} isAnalyzing={false} />
@@ -381,8 +478,11 @@ export default function ChatPage() {
                   </Card>
                 )}
 
-                <div className="text-xs text-muted-foreground">
-                  <p className="font-medium mb-2">Example questions:</p>
+                <div className="text-xs text-muted-foreground bg-muted/30 p-3 rounded-lg">
+                  <p className="font-medium mb-2 flex items-center">
+                    <Zap className="w-3 h-3 mr-1" />
+                    Quick Actions
+                  </p>
                   <ul className="space-y-1">
                     <li>• What resources are affected if I delete this deployment?</li>
                     <li>• Explain the risk of this IAM policy</li>
@@ -394,55 +494,124 @@ export default function ChatPage() {
             </div>
           </div>
 
-          {/* Main chat area with left margin for sidebar */}
+          {/* Enhanced Main Chat Area */}
           <div className="flex-1 flex flex-col md:ml-80">
-            {/* Messages - Scrollable */}
-            <div className="flex-1 overflow-y-auto">
+            {/* Enhanced Chat Header */}
+            <div className="border-b border-border/40 p-4 bg-background/80 backdrop-blur-sm flex items-center justify-between">
+              <div className="flex items-center space-x-3">
+                <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center">
+                  <MessageSquare className="w-4 h-4 text-primary" />
+                </div>
+                <div>
+                  <h2 className="font-semibold text-sm">{sessionName}</h2>
+                  <p className="text-xs text-muted-foreground">
+                    {uploadedFiles.length} file{uploadedFiles.length !== 1 ? 's' : ''} uploaded
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center space-x-2">
+                {isTyping && (
+                  <div className="flex items-center space-x-1 text-xs text-muted-foreground">
+                    <div className="w-2 h-2 bg-primary rounded-full animate-pulse"></div>
+                    <div className="w-2 h-2 bg-primary rounded-full animate-pulse" style={{animationDelay: '0.2s'}}></div>
+                    <div className="w-2 h-2 bg-primary rounded-full animate-pulse" style={{animationDelay: '0.4s'}}></div>
+                    <span className="ml-2">AI is typing...</span>
+                  </div>
+                )}
+                <Button variant="ghost" size="sm" onClick={downloadChat} className="hover:bg-primary/10">
+                  <Download className="w-4 h-4" />
+                </Button>
+              </div>
+            </div>
+
+            {/* Enhanced Messages Area */}
+            <div className="flex-1 overflow-y-auto" ref={chatContainerRef}>
               <div className="max-w-4xl mx-auto p-6 space-y-6">
                 {messages.length === 0 ? (
                   <div className="text-center py-12">
-                    <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                      <MessageSquare className="w-8 h-8 text-primary" />
+                    <div className="w-20 h-20 bg-gradient-to-br from-primary/20 to-primary/5 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                      <Brain className="w-10 h-10 text-primary" />
                     </div>
-                    <h3 className="text-xl font-semibold mb-2">Welcome to Infrastructure Chat</h3>
-                    <p className="text-muted-foreground max-w-md mx-auto">
+                    <h3 className="text-2xl font-semibold mb-3">Welcome to Infrastructure Chat</h3>
+                    <p className="text-muted-foreground max-w-md mx-auto mb-6">
                       Upload your infrastructure files and start asking questions. I can help you understand
                       configurations, identify risks, and suggest improvements.
                     </p>
+                    <div className="flex flex-wrap justify-center gap-2">
+                      <Button variant="outline" size="sm" onClick={() => setShowFileUpload(true)}>
+                        <Upload className="w-4 h-4 mr-2" />
+                        Upload File
+                      </Button>
+                      <Button variant="outline" size="sm" onClick={startNewChat}>
+                        <Plus className="w-4 h-4 mr-2" />
+                        New Chat
+                      </Button>
+                    </div>
                   </div>
                 ) : (
                   messages.map((message) => <ChatMessage key={message.id} message={message} />)
                 )}
                 {isLoading && (
-                  <ChatMessage
-                    message={{
-                      id: "loading",
-                      role: "assistant",
-                      content: "Thinking...",
-                      timestamp: new Date(),
-                    }}
-                    isLoading={true}
-                  />
+                  <div className="flex items-center space-x-3 p-4 bg-muted/30 rounded-lg">
+                    <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
+                      <Brain className="w-4 h-4 text-primary animate-pulse" />
+                    </div>
+                    <div className="flex-1">
+                      <div className="text-sm font-medium">OpsaAI</div>
+                      <div className="flex items-center space-x-1 mt-1">
+                        <div className="w-2 h-2 bg-primary rounded-full animate-bounce"></div>
+                        <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
+                        <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
+                      </div>
+                    </div>
+                  </div>
                 )}
                 <div ref={messagesEndRef} />
               </div>
             </div>
 
-            {/* Fixed Input area */}
-            <div className="border-t border-border/40 p-6 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+            {/* Enhanced Input Area */}
+            <div className="border-t border-border/40 p-6 bg-background/95 backdrop-blur-xl">
               <div className="max-w-4xl mx-auto">
                 <form onSubmit={handleSubmit} className="flex space-x-4">
-                  <Input
-                    value={input}
-                    onChange={(e) => setInput(e.target.value)}
-                    placeholder="Ask about your infrastructure..."
-                    className="flex-1"
-                    disabled={isLoading}
-                  />
-                  <Button type="submit" disabled={isLoading || !input.trim()}>
+                  <div className="flex-1 relative">
+                    <Input
+                      value={input}
+                      onChange={(e) => setInput(e.target.value)}
+                      placeholder="Ask about your infrastructure..."
+                      className="pr-12 h-12 bg-background/80 border-border/50 focus:border-primary/50 transition-colors"
+                      disabled={isLoading}
+                    />
+                    {input && (
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setInput("")}
+                        className="absolute right-2 top-1/2 transform -translate-y-1/2 h-8 w-8 p-0"
+                      >
+                        <X className="w-4 h-4" />
+                      </Button>
+                    )}
+                  </div>
+                  <Button 
+                    type="submit" 
+                    disabled={isLoading || !input.trim()}
+                    className="h-12 px-6 bg-primary hover:bg-primary/90 transition-all duration-200 shadow-lg hover:shadow-xl"
+                  >
                     <Send className="w-4 h-4" />
                   </Button>
                 </form>
+                <div className="flex items-center justify-between mt-3 text-xs text-muted-foreground">
+                  <div className="flex items-center space-x-4">
+                    <span>Press Enter to send</span>
+                    <span>•</span>
+                    <span>Shift + Enter for new line</span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <span>{input.length}/2000</span>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
