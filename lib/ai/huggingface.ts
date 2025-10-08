@@ -27,7 +27,7 @@ export class HuggingFaceAI {
     }
     
     this.apiKey = appConfig.ai.apiKey;
-    this.model = appConfig.ai.model || 'gpt2';
+    this.model = appConfig.ai.model || 'distilbert-base-uncased';
     this.baseUrl = appConfig.ai.baseUrl || 'https://api-inference.huggingface.co/models';
   }
 

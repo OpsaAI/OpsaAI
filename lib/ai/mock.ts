@@ -45,19 +45,112 @@ export class MockAI {
     await new Promise(resolve => setTimeout(resolve, 1000 + Math.random() * 2000));
 
     // Analyze prompt to provide relevant response
-    if (prompt.toLowerCase().includes('security')) {
+    const lowerPrompt = prompt.toLowerCase();
+    
+    if (lowerPrompt.includes('security') || lowerPrompt.includes('secure')) {
       return this.getRandomResponse(this.analysisTemplates.security);
     }
     
-    if (prompt.toLowerCase().includes('performance')) {
+    if (lowerPrompt.includes('performance') || lowerPrompt.includes('optimize') || lowerPrompt.includes('speed')) {
       return this.getRandomResponse(this.analysisTemplates.performance);
     }
     
-    if (prompt.toLowerCase().includes('best practice')) {
+    if (lowerPrompt.includes('best practice') || lowerPrompt.includes('recommendation')) {
       return this.getRandomResponse(this.analysisTemplates.bestPractices);
+    }
+    
+    if (lowerPrompt.includes('what is') || lowerPrompt.includes('explain') || lowerPrompt.includes('tell me about')) {
+      return this.getDetailedExplanation(prompt);
+    }
+    
+    if (lowerPrompt.includes('guide') || lowerPrompt.includes('help') || lowerPrompt.includes('how to')) {
+      return this.getGuidanceResponse(prompt);
     }
 
     return this.getRandomResponse(this.responses);
+  }
+
+  /**
+   * Get detailed explanation based on prompt
+   */
+  private getDetailedExplanation(prompt: string): string {
+    const lowerPrompt = prompt.toLowerCase();
+    
+    if (lowerPrompt.includes('infra') || lowerPrompt.includes('infrastructure')) {
+      return `## Infrastructure Analysis Guide
+
+Your infrastructure configuration contains several key components that work together to provide a robust and scalable system. Here's what I found:
+
+### 🏗️ **Architecture Overview**
+- **Configuration Type**: JSON/YAML based infrastructure definition
+- **Deployment Model**: Containerized application deployment
+- **Resource Management**: Automated scaling and resource allocation
+
+### 🔧 **Key Components**
+1. **Application Layer**: Your main application services
+2. **Data Layer**: Database and storage configurations
+3. **Network Layer**: Service discovery and load balancing
+4. **Security Layer**: Authentication and authorization
+
+### 📊 **Current State**
+- Configuration is well-structured and follows industry standards
+- Resource allocation appears balanced
+- Security configurations are in place
+
+### 🚀 **Next Steps**
+1. Review the detailed analysis above for specific recommendations
+2. Implement monitoring and alerting systems
+3. Set up automated testing and deployment pipelines
+4. Consider implementing backup and disaster recovery strategies
+
+Would you like me to elaborate on any specific aspect of your infrastructure?`;
+    }
+    
+    return `I can provide detailed analysis of your infrastructure configuration. Based on your uploaded file, I can help you understand:
+
+- **Resource configurations** and their implications
+- **Security settings** and potential improvements  
+- **Performance optimizations** and scaling strategies
+- **Best practices** for your specific setup
+- **Implementation guidance** for improvements
+
+What specific aspect would you like me to explain in detail?`;
+  }
+
+  /**
+   * Get guidance response
+   */
+  private getGuidanceResponse(prompt: string): string {
+    return `## Infrastructure Guidance
+
+I'm here to help you understand and optimize your infrastructure! Here's how I can assist:
+
+### 🔍 **Analysis Capabilities**
+- **Security Review**: Identify potential security risks and improvements
+- **Performance Optimization**: Suggest ways to improve efficiency and speed
+- **Best Practices**: Ensure your configuration follows industry standards
+- **Resource Management**: Optimize resource allocation and scaling
+
+### 📋 **What You Can Ask**
+- "What security risks do I have?"
+- "How can I improve performance?"
+- "What are the best practices for this setup?"
+- "How do I implement monitoring?"
+- "What should I do next?"
+
+### 🎯 **Immediate Actions**
+1. **Review the detailed analysis** I provided above
+2. **Focus on security** - ensure all sensitive data is properly managed
+3. **Implement monitoring** - set up alerts and logging
+4. **Plan for scaling** - consider future growth requirements
+
+### 💡 **Pro Tips**
+- Regular configuration reviews help maintain security
+- Automated testing prevents deployment issues
+- Documentation is crucial for team collaboration
+- Backup strategies protect against data loss
+
+What specific area would you like guidance on?`;
   }
 
   /**
@@ -74,35 +167,163 @@ export class MockAI {
   async analyzeInfrastructure(content: string, filename: string): Promise<string> {
     const fileType = filename.split('.').pop()?.toLowerCase();
     
-    let analysis = `## Analysis of ${filename}\n\n`;
+    // Analyze the actual content
+    const contentAnalysis = this.analyzeFileContent(content, fileType);
     
+    let analysis = `## Detailed Analysis of ${filename}\n\n`;
+    
+    analysis += `📄 **File Type**: ${fileType?.toUpperCase() || 'Unknown'}\n`;
+    analysis += `📊 **File Size**: ${content.length} characters\n\n`;
+    
+    analysis += "### 🔍 **Content Analysis**\n";
+    analysis += contentAnalysis + '\n\n';
+    
+    analysis += "### 🔒 **Security Assessment**\n";
     analysis += this.getRandomResponse(this.analysisTemplates.security) + '\n\n';
+    
+    analysis += "### ⚡ **Performance Review**\n";
     analysis += this.getRandomResponse(this.analysisTemplates.performance) + '\n\n';
+    
+    analysis += "### ✅ **Best Practices Check**\n";
     analysis += this.getRandomResponse(this.analysisTemplates.bestPractices) + '\n\n';
     
-    if (fileType === 'yaml' || fileType === 'yml') {
-      analysis += "📄 **YAML Configuration**: Well-structured YAML detected. Consider using YAML linters for validation.\n\n";
-    }
+    analysis += "### 💡 **Specific Recommendations**\n";
+    analysis += this.getSpecificRecommendations(content, fileType) + '\n\n';
     
-    if (fileType === 'json') {
-      analysis += "📄 **JSON Configuration**: Valid JSON structure. Consider adding schema validation.\n\n";
-    }
+    analysis += "### 🔧 **Implementation Steps**\n";
+    analysis += "1. **Immediate Actions**:\n";
+    analysis += "   - Review security configurations\n";
+    analysis += "   - Validate resource limits\n";
+    analysis += "   - Check naming conventions\n\n";
+    analysis += "2. **Short-term Improvements**:\n";
+    analysis += "   - Implement monitoring and alerting\n";
+    analysis += "   - Add comprehensive logging\n";
+    analysis += "   - Set up automated testing\n\n";
+    analysis += "3. **Long-term Strategy**:\n";
+    analysis += "   - Implement backup and disaster recovery\n";
+    analysis += "   - Consider infrastructure as code\n";
+    analysis += "   - Plan for scalability\n\n";
     
-    analysis += "💡 **Recommendations**:\n";
-    analysis += "- Implement proper monitoring and alerting\n";
-    analysis += "- Add comprehensive logging\n";
-    analysis += "- Consider implementing backup strategies\n";
-    analysis += "- Review and update regularly\n\n";
+    analysis += "### 📚 **Additional Resources**\n";
+    analysis += "- [Infrastructure Best Practices](https://docs.example.com)\n";
+    analysis += "- [Security Guidelines](https://security.example.com)\n";
+    analysis += "- [Performance Optimization](https://perf.example.com)\n\n";
     
-    analysis += "🔧 **Next Steps**:\n";
-    analysis += "1. Review the recommendations above\n";
-    analysis += "2. Implement monitoring solutions\n";
-    analysis += "3. Set up automated testing\n";
-    analysis += "4. Document your infrastructure\n\n";
-    
-    analysis += "*This is a demo analysis. For real AI-powered insights, run the application locally with Ollama or configure Hugging Face API.*";
+    analysis += "---\n";
+    analysis += "*This is a comprehensive demo analysis. For real-time AI insights, configure Hugging Face API or run locally with Ollama.*";
 
     return analysis;
+  }
+
+  /**
+   * Analyze file content based on type
+   */
+  private analyzeFileContent(content: string, fileType?: string): string {
+    let analysis = "";
+    
+    if (fileType === 'json') {
+      try {
+        const jsonData = JSON.parse(content);
+        analysis += `✅ **Valid JSON Structure**: The file contains valid JSON with ${Object.keys(jsonData).length} top-level properties.\n\n`;
+        
+        // Analyze JSON structure
+        if (jsonData.apiVersion) {
+          analysis += `📋 **API Version**: ${jsonData.apiVersion}\n`;
+        }
+        if (jsonData.kind) {
+          analysis += `🏷️ **Resource Type**: ${jsonData.kind}\n`;
+        }
+        if (jsonData.metadata?.name) {
+          analysis += `📝 **Resource Name**: ${jsonData.metadata.name}\n`;
+        }
+        if (jsonData.spec) {
+          analysis += `⚙️ **Configuration**: Contains specification details\n`;
+        }
+        
+        // Check for common patterns
+        if (content.includes('image:')) {
+          analysis += `🐳 **Container Images**: Found container image references\n`;
+        }
+        if (content.includes('ports:')) {
+          analysis += `🔌 **Network Ports**: Port configurations detected\n`;
+        }
+        if (content.includes('resources:')) {
+          analysis += `💾 **Resource Limits**: Resource constraints defined\n`;
+        }
+        
+      } catch (error) {
+        analysis += `❌ **JSON Validation**: Invalid JSON structure detected\n`;
+      }
+    } else if (fileType === 'yaml' || fileType === 'yml') {
+      analysis += `✅ **YAML Configuration**: Well-structured YAML detected\n\n`;
+      
+      // Analyze YAML content
+      if (content.includes('apiVersion:')) {
+        analysis += `📋 **Kubernetes Resource**: Kubernetes YAML configuration\n`;
+      }
+      if (content.includes('kind:')) {
+        analysis += `🏷️ **Resource Kind**: Kubernetes resource type defined\n`;
+      }
+      if (content.includes('metadata:')) {
+        analysis += `📝 **Metadata**: Resource metadata configured\n`;
+      }
+      if (content.includes('spec:')) {
+        analysis += `⚙️ **Specification**: Resource specification defined\n`;
+      }
+      
+      // Count resources
+      const resourceCount = (content.match(/kind:/g) || []).length;
+      if (resourceCount > 0) {
+        analysis += `📊 **Resource Count**: ${resourceCount} resources defined\n`;
+      }
+    } else {
+      analysis += `📄 **Text File**: Plain text configuration file\n`;
+      analysis += `📊 **Content Length**: ${content.length} characters\n`;
+    }
+    
+    return analysis;
+  }
+
+  /**
+   * Get specific recommendations based on content
+   */
+  private getSpecificRecommendations(content: string, fileType?: string): string {
+    let recommendations = "";
+    
+    if (fileType === 'json' || fileType === 'yaml' || fileType === 'yml') {
+      // Security recommendations
+      if (content.includes('password') || content.includes('secret')) {
+        recommendations += "🔐 **Security**: Consider using secrets management for sensitive data\n";
+      }
+      
+      // Resource recommendations
+      if (!content.includes('resources:')) {
+        recommendations += "💾 **Resources**: Add resource limits and requests for better resource management\n";
+      }
+      
+      // Health check recommendations
+      if (!content.includes('livenessProbe') && !content.includes('readinessProbe')) {
+        recommendations += "🏥 **Health Checks**: Implement liveness and readiness probes\n";
+      }
+      
+      // Monitoring recommendations
+      if (!content.includes('labels:')) {
+        recommendations += "🏷️ **Labeling**: Add proper labels for better resource organization\n";
+      }
+      
+      // Network recommendations
+      if (content.includes('ports:') && !content.includes('service:')) {
+        recommendations += "🌐 **Networking**: Consider creating services for port exposure\n";
+      }
+    }
+    
+    if (!recommendations) {
+      recommendations = "✅ **Configuration**: Your configuration follows good practices\n";
+      recommendations += "🔄 **Updates**: Consider regular configuration reviews\n";
+      recommendations += "📊 **Monitoring**: Implement comprehensive monitoring\n";
+    }
+    
+    return recommendations;
   }
 
   /**
