@@ -1,6 +1,6 @@
 # OpsaAI - An AI Powered Cloud Infra Buddy
 
-![OpsaAIonline-video-cutter com-ezgif com-video-to-gif-converter](https://github.com/user-attachments/assets/238e4d14-001c-4c46-9475-9224b43073a5)
+![opsa-ai-gif](https://github.com/user-attachments/assets/9be89c34-4008-4839-b1d3-5096a924a7bf)
 
 
 **OpsaAI** is an AI-powered platform that analyzes configuration files (YAML, JSON, Terraform, Dockerfiles, etc.) and provides **actionable insights, explanations, and recommendations**.
