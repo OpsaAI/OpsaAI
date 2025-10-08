@@ -1,7 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server"
-import { generateText } from "ai"
-import { google } from "@ai-sdk/google"
 import { getCurrentUser } from "@/lib/auth"
+import { aiService } from "@/lib/ai"
 
 interface DiagramNode {
   id: string
@@ -208,152 +207,32 @@ Include security and performance annotations. Respond ONLY with valid JSON, no a
       })
     }
 
-    const { text } = await generateText({
-      model: google("gemini-1.5-pro"),
-      prompt,
-      maxOutputTokens: 2000,
+    const aiResponse = await aiService.generateVisualization(content, filename || "Unknown")
+
+    return NextResponse.json({
+      diagram: aiResponse,
+      filename: filename || "Unknown",
+      timestamp: new Date().toISOString(),
+      provider: aiResponse.provider || 'mock',
+      isMock: aiResponse.isMock || true,
     })
-
-    try {
-      const diagram = JSON.parse(text)
-
-      return NextResponse.json({
-        diagram,
-        filename: filename || "Unknown",
-        timestamp: new Date().toISOString(),
-      })
-    } catch (parseError) {
-      // Fallback with mock data if JSON parsing fails
-      const mockDiagram = {
-        nodes: [
-          {
-            id: "resource-1",
-            type: "deployment",
-            label: "Application",
-            data: {
-              name: "app-deployment",
-              kind: "Deployment",
-              namespace: "default",
-              details: { replicas: 3 },
-            },
-            position: { x: 100, y: 100 },
-          },
-        ],
-        edges: [],
-        metadata: {
-          totalResources: 1,
-          resourceTypes: ["Deployment"],
-          namespaces: ["default"],
-        },
-      }
-
-      return NextResponse.json({
-        diagram: mockDiagram,
-        filename: "Unknown",
-        timestamp: new Date().toISOString(),
-      })
-    }
   } catch (error) {
     console.error("Error in /api/visualize:", error)
     
-    // Check if it's a quota exceeded error
-    if (error instanceof Error && (error.message.includes("quota") || error.message.includes("429") || error.message.includes("RESOURCE_EXHAUSTED"))) {
-      console.log("Quota exceeded, returning mock visualization")
-      
-      const mockDiagram = {
-        nodes: [
-          {
-            id: "resource-1",
-            type: "deployment",
-            label: "Sample Application",
-            data: {
-              name: "app-deployment",
-              kind: "Deployment",
-              namespace: "default",
-              details: { replicas: 3 },
-            },
-            position: { x: 200, y: 200 },
-          },
-          {
-            id: "resource-2",
-            type: "service",
-            label: "Application Service",
-            data: {
-              name: "app-service",
-              kind: "Service",
-              namespace: "default",
-              details: { type: "ClusterIP" },
-            },
-            position: { x: 400, y: 200 },
-          },
-          {
-            id: "resource-3",
-            type: "ingress",
-            label: "Application Ingress",
-            data: {
-              name: "app-ingress",
-              kind: "Ingress",
-              namespace: "default",
-              details: { host: "app.example.com" },
-            },
-            position: { x: 600, y: 200 },
-          },
-          {
-            id: "resource-4",
-            type: "configmap",
-            label: "App Config",
-            data: {
-              name: "app-config",
-              kind: "ConfigMap",
-              namespace: "default",
-              details: { data: "configuration" },
-            },
-            position: { x: 200, y: 400 },
-          },
-        ],
-        edges: [
-          {
-            id: "edge-1",
-            source: "resource-1",
-            target: "resource-2",
-            label: "exposes",
-            type: "service"
-          },
-          {
-            id: "edge-2",
-            source: "resource-2",
-            target: "resource-3",
-            label: "routes to",
-            type: "ingress"
-          },
-          {
-            id: "edge-3",
-            source: "resource-4",
-            target: "resource-1",
-            label: "configures",
-            type: "config"
-          },
-        ],
-        metadata: {
-          totalResources: 4,
-          resourceTypes: ["Deployment", "Service", "Ingress", "ConfigMap"],
-          namespaces: ["default"],
-        },
-      }
-
+    // Fallback to mock visualization
+    try {
+      const mockResponse = await aiService.generateVisualization(content, filename || "Unknown")
       return NextResponse.json({
-        diagram: mockDiagram,
-        filename: "Unknown",
+        diagram: mockResponse,
+        filename: filename || "Unknown",
         timestamp: new Date().toISOString(),
+        provider: 'mock-fallback',
+        isMock: true,
       })
-    }
-    
-    if (error instanceof Error && (error.message.includes("API key") || error.message.includes("authentication"))) {
+    } catch (fallbackError) {
       return NextResponse.json({ 
-        error: "AI service configuration error. Please check your Google AI API key." 
+        error: "Failed to generate visualization. Please try again." 
       }, { status: 500 })
     }
-    
-    return NextResponse.json({ error: "Failed to generate visualization. Please try again." }, { status: 500 })
   }
 }

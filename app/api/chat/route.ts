@@ -1,10 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { Ollama } from 'ollama';
-
-// Initialize Ollama client
-const ollama = new Ollama({
-  host: 'http://localhost:11434', // Default Ollama host
-});
+import { aiService } from '@/lib/ai';
+import { appConfig } from '@/lib/config';
 
 // Simple vector store simulation (same as upload route)
 // Use global variable to persist data between requests
@@ -114,26 +110,19 @@ User Question: ${question}
 
 Please provide a helpful and accurate response based on the context provided. If the question cannot be answered from the context, please say so.`;
     
-    // Generate response using Ollama
-    const response = await ollama.generate({
-      model: 'llama3',
-      prompt: systemPrompt,
-      stream: false,
-      options: {
-        temperature: 0.7,
-        top_p: 0.9,
-        num_predict: 1000,
-      },
-    });
+    // Generate response using AI service
+    const aiResponse = await aiService.generateText(systemPrompt, 1000);
     
     return NextResponse.json({
       success: true,
-      answer: response.response,
+      answer: aiResponse.content,
       chunksUsed: relevantChunks.length,
       context: relevantChunks.map(chunk => ({
         text: chunk.text.substring(0, 100) + '...',
         chunkIndex: chunk.chunkIndex,
       })),
+      provider: aiResponse.provider,
+      isMock: aiResponse.isMock,
     });
     
   } catch (error) {
