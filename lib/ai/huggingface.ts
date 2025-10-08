@@ -21,6 +21,7 @@ export class HuggingFaceAI {
   private baseUrl: string;
 
   constructor() {
+    // Only initialize if we have an API key
     if (!appConfig.ai.apiKey) {
       throw new Error('Hugging Face API key not configured');
     }
@@ -161,5 +162,12 @@ JSON:`;
   }
 }
 
-// Export singleton instance
-export const huggingFaceAI = new HuggingFaceAI();
+// Export lazy-loaded singleton instance
+let huggingFaceAIInstance: HuggingFaceAI | null = null;
+
+export function getHuggingFaceAI(): HuggingFaceAI {
+  if (!huggingFaceAIInstance) {
+    huggingFaceAIInstance = new HuggingFaceAI();
+  }
+  return huggingFaceAIInstance;
+}

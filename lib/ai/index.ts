@@ -4,7 +4,7 @@
  */
 
 import { appConfig, isAIAvailable, isHuggingFace, isOllama, isMockMode } from '../config';
-import { huggingFaceAI } from './huggingface';
+import { getHuggingFaceAI } from './huggingface';
 import { mockAI } from './mock';
 
 export interface ChatMessage {
@@ -33,7 +33,7 @@ export class AIService {
       let content: string;
 
       if (isHuggingFace()) {
-        content = await huggingFaceAI.generateText(prompt, maxLength);
+        content = await getHuggingFaceAI().generateText(prompt, maxLength);
       } else if (isMockMode()) {
         content = await mockAI.generateText(prompt);
       } else {
@@ -71,7 +71,7 @@ export class AIService {
       let content: string;
 
       if (isHuggingFace()) {
-        content = await huggingFaceAI.chat(messages);
+        content = await getHuggingFaceAI().chat(messages);
       } else if (isMockMode()) {
         content = await mockAI.chat(messages);
       } else {
@@ -108,7 +108,7 @@ export class AIService {
       let analysis: string;
 
       if (isHuggingFace()) {
-        analysis = await huggingFaceAI.analyzeInfrastructure(content, filename);
+        analysis = await getHuggingFaceAI().analyzeInfrastructure(content, filename);
       } else if (isMockMode()) {
         analysis = await mockAI.analyzeInfrastructure(content, filename);
       } else {
@@ -143,7 +143,7 @@ export class AIService {
   async generateVisualization(content: string, filename: string): Promise<any> {
     try {
       if (isHuggingFace()) {
-        return await huggingFaceAI.generateVisualization(content, filename);
+        return await getHuggingFaceAI().generateVisualization(content, filename);
       } else if (isMockMode()) {
         return await mockAI.generateVisualization(content, filename);
       } else {
