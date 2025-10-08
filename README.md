@@ -6,7 +6,8 @@
 
 > AI-powered platform for analyzing cloud infrastructure files with intelligent chat assistance and visualization.
 
-![OpsaAI Demo](https://github.com/OpsaAI/OpsaAI/assets/your-username/opsaai-demo.gif)
+![opsa-ai-gif](https://github.com/user-attachments/assets/7c690567-245a-402a-a186-19be5372af02)
+
 
 ## What is OpsaAI?
 
