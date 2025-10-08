@@ -8,7 +8,7 @@ updates:
       day: "monday"
       time: "09:00"
       timezone: "UTC"
-    open-pull-requests-limit: 10
+    open-pull-requests-limit: 3
     reviewers:
       - "OpsaAI/team"
     assignees:
@@ -29,6 +29,13 @@ updates:
         update-types: ["version-update:semver-major"]
       - dependency-name: "typescript"
         update-types: ["version-update:semver-major"]
+      # Ignore minor updates for less critical packages
+      - dependency-name: "@types/*"
+        update-types: ["version-update:semver-minor", "version-update:semver-major"]
+      - dependency-name: "eslint*"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "prettier*"
+        update-types: ["version-update:semver-major"]
 
   # Enable version updates for GitHub Actions
   - package-ecosystem: "github-actions"
@@ -38,7 +45,7 @@ updates:
       day: "monday"
       time: "09:00"
       timezone: "UTC"
-    open-pull-requests-limit: 5
+    open-pull-requests-limit: 2
     reviewers:
       - "OpsaAI/team"
     assignees:
@@ -58,7 +65,7 @@ updates:
       day: "monday"
       time: "09:00"
       timezone: "UTC"
-    open-pull-requests-limit: 5
+    open-pull-requests-limit: 2
     reviewers:
       - "OpsaAI/team"
     assignees:
