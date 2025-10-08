@@ -325,12 +325,12 @@ export default function ChatPage() {
   return (
     <AuthWrapper>
       <Layout showBackground={false}>
-        <div className="h-screen flex bg-gradient-to-br from-background via-background to-muted/20">
+        <div className="h-screen flex bg-gradient-to-br from-background via-background to-muted/20 overflow-hidden">
           {/* Mobile Menu Button */}
           <Button
             variant="ghost"
             size="sm"
-            className="fixed top-4 left-4 z-20 md:hidden bg-background/80 backdrop-blur-sm border shadow-lg"
+            className="fixed top-3 left-3 z-20 md:hidden bg-background/90 backdrop-blur-sm border shadow-lg h-8 w-8 p-0"
             onClick={() => setSidebarOpen(!sidebarOpen)}
             data-menu-button
           >
@@ -339,73 +339,73 @@ export default function ChatPage() {
 
           {/* Enhanced Fixed Sidebar */}
           <div 
-            className={`w-80 border-r border-border/40 bg-card/80 backdrop-blur-xl flex flex-col fixed left-0 top-0 h-full z-10 transition-all duration-300 shadow-xl ${
+            className={`w-72 sm:w-80 border-r border-border/40 bg-card/80 backdrop-blur-xl flex flex-col fixed left-0 top-0 h-full z-10 transition-all duration-300 shadow-xl ${
               sidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
             }`}
             data-sidebar
           >
             {/* Enhanced Header */}
-            <div className="p-4 border-b border-border/40 flex-shrink-0 bg-gradient-to-r from-primary/5 to-transparent">
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center space-x-2">
-                  <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center">
-                    <Brain className="w-4 h-4 text-primary" />
+            <div className="p-3 sm:p-4 border-b border-border/40 flex-shrink-0 bg-gradient-to-r from-primary/5 to-transparent">
+              <div className="flex items-center justify-between mb-3 sm:mb-4">
+                <div className="flex items-center space-x-2 min-w-0">
+                  <div className="w-6 h-6 sm:w-8 sm:h-8 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <Brain className="w-3 h-3 sm:w-4 sm:h-4 text-primary" />
                   </div>
-                  <h3 className="text-sm font-semibold">Chat History</h3>
+                  <h3 className="text-xs sm:text-sm font-semibold truncate">Chat History</h3>
                 </div>
-                <div className="flex items-center space-x-1">
-                  <Button variant="ghost" size="sm" onClick={startNewChat} className="hover:bg-primary/10">
-                    <Plus className="w-4 h-4" />
+                <div className="flex items-center space-x-1 flex-shrink-0">
+                  <Button variant="ghost" size="sm" onClick={startNewChat} className="hover:bg-primary/10 h-7 w-7 sm:h-8 sm:w-8 p-0">
+                    <Plus className="w-3 h-3 sm:w-4 sm:h-4" />
                   </Button>
-                  <Button variant="ghost" size="sm" onClick={() => setShowSettings(!showSettings)} className="hover:bg-primary/10">
-                    <Settings className="w-4 h-4" />
+                  <Button variant="ghost" size="sm" onClick={() => setShowSettings(!showSettings)} className="hover:bg-primary/10 h-7 w-7 sm:h-8 sm:w-8 p-0">
+                    <Settings className="w-3 h-3 sm:w-4 sm:h-4" />
                   </Button>
                 </div>
               </div>
               
               {/* Search Bar */}
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <Search className="absolute left-2 sm:left-3 top-1/2 transform -translate-y-1/2 w-3 h-3 sm:w-4 sm:h-4 text-muted-foreground" />
                 <Input
                   placeholder="Search chats..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10 h-8 text-sm bg-background/50 border-border/50"
+                  className="pl-8 sm:pl-10 h-7 sm:h-8 text-xs sm:text-sm bg-background/50 border-border/50"
                 />
               </div>
             </div>
 
             {/* Enhanced Chat Sessions */}
-            <div className="flex-1 overflow-y-auto p-4">
-              <div className="space-y-2">
+            <div className="flex-1 overflow-y-auto p-2 sm:p-4 min-h-0">
+              <div className="space-y-1 sm:space-y-2">
                 {filteredSessions.length === 0 ? (
-                  <div className="text-center py-8">
-                    <MessageSquare className="w-8 h-8 text-muted-foreground mx-auto mb-2" />
+                  <div className="text-center py-6 sm:py-8">
+                    <MessageSquare className="w-6 h-6 sm:w-8 sm:h-8 text-muted-foreground mx-auto mb-2" />
                     <p className="text-xs text-muted-foreground">No chats found</p>
                   </div>
                 ) : (
                   filteredSessions.map((session) => (
                     <div
                       key={session.id}
-                      className={`group relative p-3 rounded-lg cursor-pointer transition-all duration-200 hover:bg-muted/50 ${
+                      className={`group relative p-2 sm:p-3 rounded-lg cursor-pointer transition-all duration-200 hover:bg-muted/50 ${
                         currentSessionId === session.id ? "bg-primary/10 border border-primary/20" : "hover:shadow-sm"
                       }`}
                       onClick={() => loadChatSession(session.id)}
                     >
-                      <div className="flex items-start justify-between">
+                      <div className="flex items-start justify-between gap-2">
                         <div className="flex-1 min-w-0">
-                          <div className="font-medium text-sm truncate mb-1">{session.name}</div>
-                          <div className="text-xs text-muted-foreground truncate">{session.lastMessage}</div>
+                          <div className="font-medium text-xs sm:text-sm truncate mb-1">{session.name}</div>
+                          <div className="text-xs text-muted-foreground truncate leading-tight">{session.lastMessage}</div>
                           <div className="text-xs text-muted-foreground mt-1">
                             {new Date(session.timestamp).toLocaleDateString()}
                           </div>
                         </div>
-                        <div className="opacity-0 group-hover:opacity-100 transition-opacity flex items-center space-x-1">
-                          <Button variant="ghost" size="sm" className="h-6 w-6 p-0 hover:bg-destructive/10">
-                            <Trash2 className="w-3 h-3" />
+                        <div className="opacity-0 group-hover:opacity-100 transition-opacity flex items-center space-x-1 flex-shrink-0">
+                          <Button variant="ghost" size="sm" className="h-5 w-5 sm:h-6 sm:w-6 p-0 hover:bg-destructive/10">
+                            <Trash2 className="w-2 h-2 sm:w-3 sm:h-3" />
                           </Button>
-                          <Button variant="ghost" size="sm" className="h-6 w-6 p-0 hover:bg-primary/10">
-                            <Edit3 className="w-3 h-3" />
+                          <Button variant="ghost" size="sm" className="h-5 w-5 sm:h-6 sm:w-6 p-0 hover:bg-primary/10">
+                            <Edit3 className="w-2 h-2 sm:w-3 sm:h-3" />
                           </Button>
                         </div>
                       </div>
@@ -416,47 +416,47 @@ export default function ChatPage() {
             </div>
 
             {/* Enhanced File Upload Section */}
-            <div className="border-t border-border/40 p-4 bg-gradient-to-r from-transparent to-primary/5">
-              <div className="space-y-4">
+            <div className="border-t border-border/40 p-2 sm:p-4 bg-gradient-to-r from-transparent to-primary/5 flex-shrink-0">
+              <div className="space-y-2 sm:space-y-4">
                 <div className="flex items-center justify-between">
-                  <h3 className="text-sm font-semibold flex items-center">
-                    <Upload className="w-4 h-4 mr-2" />
+                  <h3 className="text-xs sm:text-sm font-semibold flex items-center">
+                    <Upload className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
                     Files
                   </h3>
                   <Button
                     variant="ghost"
                     size="sm"
                     onClick={() => setShowFileUpload(!showFileUpload)}
-                    className="text-xs"
+                    className="text-xs h-6 w-6 sm:h-8 sm:w-8 p-0"
                   >
                     {showFileUpload ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
                   </Button>
                 </div>
 
                 {uploadedFiles.length > 0 && (
-                  <div className="space-y-2 max-h-32 overflow-y-auto">
+                  <div className="space-y-1 sm:space-y-2 max-h-24 sm:max-h-32 overflow-y-auto">
                     {uploadedFiles.map((file, index) => (
-                      <div key={index} className="flex items-center justify-between p-2 bg-muted/50 rounded-md group">
+                      <div key={index} className="flex items-center justify-between p-1.5 sm:p-2 bg-muted/50 rounded-md group">
                         <div className="flex-1 min-w-0">
                           <p className="text-xs font-medium truncate">{file.name}</p>
-                          <p className="text-xs text-muted-foreground">{file.type || "Unknown type"}</p>
+                          <p className="text-xs text-muted-foreground truncate">{file.type || "Unknown type"}</p>
                         </div>
-                        <div className="opacity-0 group-hover:opacity-100 transition-opacity flex items-center space-x-1">
+                        <div className="opacity-0 group-hover:opacity-100 transition-opacity flex items-center space-x-1 flex-shrink-0">
                           <Button
                             variant="ghost"
                             size="sm"
                             onClick={() => copyToClipboard(file.content)}
-                            className="h-6 w-6 p-0 hover:bg-primary/10"
+                            className="h-5 w-5 sm:h-6 sm:w-6 p-0 hover:bg-primary/10"
                           >
-                            <Copy className="w-3 h-3" />
+                            <Copy className="w-2 h-2 sm:w-3 sm:h-3" />
                           </Button>
                           <Button
                             variant="ghost"
                             size="sm"
                             onClick={() => removeFile(file.name)}
-                            className="h-6 w-6 p-0 hover:bg-destructive/10"
+                            className="h-5 w-5 sm:h-6 sm:w-6 p-0 hover:bg-destructive/10"
                           >
-                            <X className="w-3 h-3" />
+                            <X className="w-2 h-2 sm:w-3 sm:h-3" />
                           </Button>
                         </div>
                       </div>
@@ -466,28 +466,28 @@ export default function ChatPage() {
 
                 {showFileUpload && (
                   <Card className="border-primary/20 bg-gradient-to-br from-primary/5 to-transparent">
-                    <CardHeader className="pb-2">
-                      <CardTitle className="text-sm flex items-center">
-                        <Upload className="w-4 h-4 mr-2" />
+                    <CardHeader className="pb-2 p-3 sm:p-6">
+                      <CardTitle className="text-xs sm:text-sm flex items-center">
+                        <Upload className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
                         Upload Infrastructure File
                       </CardTitle>
                     </CardHeader>
-                    <CardContent className="pt-0">
+                    <CardContent className="pt-0 p-3 sm:p-6">
                       <FileUpload onFileUpload={handleFileUpload} isAnalyzing={false} />
                     </CardContent>
                   </Card>
                 )}
 
-                <div className="text-xs text-muted-foreground bg-muted/30 p-3 rounded-lg">
-                  <p className="font-medium mb-2 flex items-center">
+                <div className="text-xs text-muted-foreground bg-muted/30 p-2 sm:p-3 rounded-lg">
+                  <p className="font-medium mb-1 sm:mb-2 flex items-center">
                     <Zap className="w-3 h-3 mr-1" />
                     Quick Actions
                   </p>
-                  <ul className="space-y-1">
-                    <li>• What resources are affected if I delete this deployment?</li>
-                    <li>• Explain the risk of this IAM policy</li>
-                    <li>• How can I optimize this configuration?</li>
-                    <li>• Are there any security vulnerabilities?</li>
+                  <ul className="space-y-0.5 sm:space-y-1 text-xs leading-tight">
+                    <li className="truncate">• What resources are affected if I delete this deployment?</li>
+                    <li className="truncate">• Explain the risk of this IAM policy</li>
+                    <li className="truncate">• How can I optimize this configuration?</li>
+                    <li className="truncate">• Are there any security vulnerabilities?</li>
                   </ul>
                 </div>
               </div>
@@ -495,54 +495,54 @@ export default function ChatPage() {
           </div>
 
           {/* Enhanced Main Chat Area */}
-          <div className="flex-1 flex flex-col md:ml-80">
+          <div className="flex-1 flex flex-col md:ml-72 lg:ml-80 min-w-0">
             {/* Enhanced Chat Header */}
-            <div className="border-b border-border/40 p-4 bg-background/80 backdrop-blur-sm flex items-center justify-between">
-              <div className="flex items-center space-x-3">
-                <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center">
-                  <MessageSquare className="w-4 h-4 text-primary" />
+            <div className="border-b border-border/40 p-3 sm:p-4 bg-background/80 backdrop-blur-sm flex items-center justify-between flex-shrink-0">
+              <div className="flex items-center space-x-2 sm:space-x-3 min-w-0">
+                <div className="w-6 h-6 sm:w-8 sm:h-8 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <MessageSquare className="w-3 h-3 sm:w-4 sm:h-4 text-primary" />
                 </div>
-                <div>
-                  <h2 className="font-semibold text-sm">{sessionName}</h2>
+                <div className="min-w-0">
+                  <h2 className="font-semibold text-xs sm:text-sm truncate">{sessionName}</h2>
                   <p className="text-xs text-muted-foreground">
                     {uploadedFiles.length} file{uploadedFiles.length !== 1 ? 's' : ''} uploaded
                   </p>
                 </div>
               </div>
-              <div className="flex items-center space-x-2">
+              <div className="flex items-center space-x-1 sm:space-x-2 flex-shrink-0">
                 {isTyping && (
                   <div className="flex items-center space-x-1 text-xs text-muted-foreground">
-                    <div className="w-2 h-2 bg-primary rounded-full animate-pulse"></div>
-                    <div className="w-2 h-2 bg-primary rounded-full animate-pulse" style={{animationDelay: '0.2s'}}></div>
-                    <div className="w-2 h-2 bg-primary rounded-full animate-pulse" style={{animationDelay: '0.4s'}}></div>
-                    <span className="ml-2">AI is typing...</span>
+                    <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-primary rounded-full animate-pulse"></div>
+                    <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-primary rounded-full animate-pulse" style={{animationDelay: '0.2s'}}></div>
+                    <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-primary rounded-full animate-pulse" style={{animationDelay: '0.4s'}}></div>
+                    <span className="ml-1 sm:ml-2 hidden sm:inline">AI is typing...</span>
                   </div>
                 )}
-                <Button variant="ghost" size="sm" onClick={downloadChat} className="hover:bg-primary/10">
-                  <Download className="w-4 h-4" />
+                <Button variant="ghost" size="sm" onClick={downloadChat} className="hover:bg-primary/10 h-7 w-7 sm:h-8 sm:w-8 p-0">
+                  <Download className="w-3 h-3 sm:w-4 sm:h-4" />
                 </Button>
               </div>
             </div>
 
             {/* Enhanced Messages Area */}
-            <div className="flex-1 overflow-y-auto" ref={chatContainerRef}>
-              <div className="max-w-4xl mx-auto p-6 space-y-6">
+            <div className="flex-1 overflow-y-auto min-h-0" ref={chatContainerRef}>
+              <div className="max-w-4xl mx-auto p-3 sm:p-6 space-y-4 sm:space-y-6">
                 {messages.length === 0 ? (
-                  <div className="text-center py-12">
-                    <div className="w-20 h-20 bg-gradient-to-br from-primary/20 to-primary/5 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                      <Brain className="w-10 h-10 text-primary" />
+                  <div className="text-center py-8 sm:py-12">
+                    <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-primary/20 to-primary/5 rounded-2xl flex items-center justify-center mx-auto mb-4 sm:mb-6">
+                      <Brain className="w-8 h-8 sm:w-10 sm:h-10 text-primary" />
                     </div>
-                    <h3 className="text-2xl font-semibold mb-3">Welcome to Infrastructure Chat</h3>
-                    <p className="text-muted-foreground max-w-md mx-auto mb-6">
+                    <h3 className="text-lg sm:text-2xl font-semibold mb-2 sm:mb-3">Welcome to Infrastructure Chat</h3>
+                    <p className="text-muted-foreground max-w-md mx-auto mb-4 sm:mb-6 text-sm sm:text-base px-4">
                       Upload your infrastructure files and start asking questions. I can help you understand
                       configurations, identify risks, and suggest improvements.
                     </p>
-                    <div className="flex flex-wrap justify-center gap-2">
-                      <Button variant="outline" size="sm" onClick={() => setShowFileUpload(true)}>
+                    <div className="flex flex-col sm:flex-row justify-center gap-2 px-4">
+                      <Button variant="outline" size="sm" onClick={() => setShowFileUpload(true)} className="w-full sm:w-auto">
                         <Upload className="w-4 h-4 mr-2" />
                         Upload File
                       </Button>
-                      <Button variant="outline" size="sm" onClick={startNewChat}>
+                      <Button variant="outline" size="sm" onClick={startNewChat} className="w-full sm:w-auto">
                         <Plus className="w-4 h-4 mr-2" />
                         New Chat
                       </Button>
@@ -552,16 +552,16 @@ export default function ChatPage() {
                   messages.map((message) => <ChatMessage key={message.id} message={message} />)
                 )}
                 {isLoading && (
-                  <div className="flex items-center space-x-3 p-4 bg-muted/30 rounded-lg">
-                    <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
-                      <Brain className="w-4 h-4 text-primary animate-pulse" />
+                  <div className="flex items-center space-x-3 p-3 sm:p-4 bg-muted/30 rounded-lg">
+                    <div className="w-6 h-6 sm:w-8 sm:h-8 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
+                      <Brain className="w-3 h-3 sm:w-4 sm:h-4 text-primary animate-pulse" />
                     </div>
-                    <div className="flex-1">
-                      <div className="text-sm font-medium">OpsaAI</div>
+                    <div className="flex-1 min-w-0">
+                      <div className="text-xs sm:text-sm font-medium">OpsaAI</div>
                       <div className="flex items-center space-x-1 mt-1">
-                        <div className="w-2 h-2 bg-primary rounded-full animate-bounce"></div>
-                        <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
-                        <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
+                        <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-primary rounded-full animate-bounce"></div>
+                        <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-primary rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
+                        <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-primary rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
                       </div>
                     </div>
                   </div>
@@ -571,15 +571,15 @@ export default function ChatPage() {
             </div>
 
             {/* Enhanced Input Area */}
-            <div className="border-t border-border/40 p-6 bg-background/95 backdrop-blur-xl">
+            <div className="border-t border-border/40 p-3 sm:p-6 bg-background/95 backdrop-blur-xl flex-shrink-0">
               <div className="max-w-4xl mx-auto">
-                <form onSubmit={handleSubmit} className="flex space-x-4">
-                  <div className="flex-1 relative">
+                <form onSubmit={handleSubmit} className="flex space-x-2 sm:space-x-4">
+                  <div className="flex-1 relative min-w-0">
                     <Input
                       value={input}
                       onChange={(e) => setInput(e.target.value)}
                       placeholder="Ask about your infrastructure..."
-                      className="pr-12 h-12 bg-background/80 border-border/50 focus:border-primary/50 transition-colors"
+                      className="pr-10 sm:pr-12 h-10 sm:h-12 bg-background/80 border-border/50 focus:border-primary/50 transition-colors text-sm sm:text-base"
                       disabled={isLoading}
                     />
                     {input && (
@@ -588,25 +588,26 @@ export default function ChatPage() {
                         variant="ghost"
                         size="sm"
                         onClick={() => setInput("")}
-                        className="absolute right-2 top-1/2 transform -translate-y-1/2 h-8 w-8 p-0"
+                        className="absolute right-1 sm:right-2 top-1/2 transform -translate-y-1/2 h-6 w-6 sm:h-8 sm:w-8 p-0"
                       >
-                        <X className="w-4 h-4" />
+                        <X className="w-3 h-3 sm:w-4 sm:h-4" />
                       </Button>
                     )}
                   </div>
                   <Button 
                     type="submit" 
                     disabled={isLoading || !input.trim()}
-                    className="h-12 px-6 bg-primary hover:bg-primary/90 transition-all duration-200 shadow-lg hover:shadow-xl"
+                    className="h-10 sm:h-12 px-3 sm:px-6 bg-primary hover:bg-primary/90 transition-all duration-200 shadow-lg hover:shadow-xl flex-shrink-0"
                   >
                     <Send className="w-4 h-4" />
                   </Button>
                 </form>
-                <div className="flex items-center justify-between mt-3 text-xs text-muted-foreground">
-                  <div className="flex items-center space-x-4">
-                    <span>Press Enter to send</span>
-                    <span>•</span>
-                    <span>Shift + Enter for new line</span>
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mt-2 sm:mt-3 text-xs text-muted-foreground gap-1 sm:gap-0">
+                  <div className="flex items-center space-x-2 sm:space-x-4">
+                    <span className="hidden sm:inline">Press Enter to send</span>
+                    <span className="hidden sm:inline">•</span>
+                    <span className="hidden sm:inline">Shift + Enter for new line</span>
+                    <span className="sm:hidden">Enter to send</span>
                   </div>
                   <div className="flex items-center space-x-2">
                     <span>{input.length}/2000</span>
