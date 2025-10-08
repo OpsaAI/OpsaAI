@@ -32,7 +32,8 @@ OpsaAI helps developers analyze their infrastructure files using AI. Upload your
 
 ### Prerequisites
 - Node.js 18+
-- Docker (for AI services)
+- Ollama (for local AI)
+- Docker (optional, for ChromaDB persistence)
 
 ### Setup
 ```bash
@@ -44,7 +45,7 @@ pnpm install
 # Setup environment
 cp env.example .env.local
 
-# Start AI services
+# Setup AI services (Ollama + ChromaDB)
 ./scripts/setup-services.sh
 
 # Start the app

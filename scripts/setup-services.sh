@@ -2,50 +2,66 @@
 
 echo "🚀 Setting up OpsaAI services..."
 
-# Check if Docker is running
-if ! docker info > /dev/null 2>&1; then
-    echo "❌ Docker is not running. Please start Docker first."
-    echo "   Download Docker: https://www.docker.com/products/docker-desktop"
+# Check if Ollama is installed and running
+echo "🤖 Checking Ollama..."
+if command -v ollama &> /dev/null; then
+    echo "✅ Ollama is installed"
+    
+    # Check if Ollama service is running
+    if curl -s http://localhost:11434/api/tags > /dev/null 2>&1; then
+        echo "✅ Ollama is running"
+        
+        # Check if llama3 model is available
+        if ollama list | grep -q "llama3"; then
+            echo "✅ llama3 model is available"
+        else
+            echo "📥 Downloading llama3 model (this may take a few minutes)..."
+            ollama pull llama3
+        fi
+    else
+        echo "❌ Ollama is not running. Please start Ollama:"
+        echo "   - macOS: brew services start ollama"
+        echo "   - Linux: sudo systemctl start ollama"
+        echo "   - Windows: Start Ollama from Start Menu"
+        exit 1
+    fi
+else
+    echo "❌ Ollama is not installed. Please install Ollama first:"
+    echo "   Visit: https://ollama.ai/download"
     exit 1
 fi
 
-# Start ChromaDB (Vector Database)
-echo "📦 Starting ChromaDB..."
-if docker ps | grep -q chromadb; then
-    echo "✅ ChromaDB is already running"
+# Check if Docker is running for ChromaDB
+echo "📦 Checking ChromaDB..."
+if ! docker info > /dev/null 2>&1; then
+    echo "⚠️  Docker is not running. ChromaDB will use in-memory storage."
+    echo "   For persistent storage, start Docker and run:"
+    echo "   docker run -d --name chromadb -p 8000:8000 chromadb/chroma:latest"
 else
-    docker run -d \
-      --name chromadb \
-      -p 8000:8000 \
-      -v chroma_data:/chroma/chroma \
-      chromadb/chroma:latest
-    
-    echo "⏳ Waiting for ChromaDB to start..."
-    sleep 10
-fi
-
-# Start Ollama (AI Model)
-echo "🤖 Starting Ollama..."
-if docker ps | grep -q ollama; then
-    echo "✅ Ollama is already running"
-else
-    docker run -d \
-      --name ollama \
-      -p 11434:11434 \
-      -v ollama:/root/.ollama \
-      ollama/ollama
-    
-    echo "⏳ Waiting for Ollama to start..."
-    sleep 10
-    
-    echo "📥 Downloading llama3 model (this may take a few minutes)..."
-    docker exec ollama ollama pull llama3
+    # Start ChromaDB (Vector Database)
+    if docker ps | grep -q chromadb; then
+        echo "✅ ChromaDB is already running"
+    else
+        echo "📦 Starting ChromaDB..."
+        docker run -d \
+          --name chromadb \
+          -p 8000:8000 \
+          -v chroma_data:/chroma/chroma \
+          chromadb/chroma:latest
+        
+        echo "⏳ Waiting for ChromaDB to start..."
+        sleep 10
+    fi
 fi
 
 echo ""
 echo "🎉 Setup complete! Services running:"
-echo "   - ChromaDB: http://localhost:8000"
-echo "   - Ollama: http://localhost:11434"
+echo "   - Ollama: http://localhost:11434 (llama3 model)"
+if docker ps | grep -q chromadb; then
+    echo "   - ChromaDB: http://localhost:8000"
+else
+    echo "   - ChromaDB: In-memory storage (no persistence)"
+fi
 echo ""
 echo "Next steps:"
 echo "   1. Start the app: pnpm dev"
