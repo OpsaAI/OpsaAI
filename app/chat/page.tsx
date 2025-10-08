@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useState, useRef, useEffect } from "react"
+import { useState, useRef, useEffect, useCallback } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -61,7 +61,7 @@ export default function ChatPage() {
     if (messages.length > 0 && currentSessionId) {
       saveChatHistory()
     }
-  }, [messages, currentSessionId])
+  }, [messages, currentSessionId, saveChatHistory])
 
   const loadChatSessions = async () => {
     try {
@@ -75,7 +75,7 @@ export default function ChatPage() {
     }
   }
 
-  const saveChatHistory = async () => {
+  const saveChatHistory = useCallback(async () => {
     if (!currentSessionId || messages.length === 0) return
 
     try {
@@ -92,7 +92,7 @@ export default function ChatPage() {
     } catch (error) {
       console.error("Failed to save chat history:", error)
     }
-  }
+  }, [currentSessionId, messages, sessionName, uploadedFiles])
 
   const loadChatSession = async (sessionId: string) => {
     try {

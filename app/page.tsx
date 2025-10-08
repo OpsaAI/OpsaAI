@@ -274,7 +274,7 @@ export default function HomePage() {
                           <Brain className="w-3 h-3 text-blue-600" />
                         </div>
                         <div className="flex-1">
-                          <p className="text-xs md:text-sm text-blue-800 dark:text-blue-200">I've analyzed your Kubernetes configuration and found 3 optimization opportunities...</p>
+                          <p className="text-xs md:text-sm text-blue-800 dark:text-blue-200">I&apos;ve analyzed your Kubernetes configuration and found 3 optimization opportunities...</p>
                         </div>
                       </div>
                       <div className="flex items-start space-x-3">
