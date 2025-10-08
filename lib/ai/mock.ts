@@ -63,6 +63,14 @@ export class MockAI {
       return this.getDetailedExplanation(prompt);
     }
     
+    if (lowerPrompt.includes('filename') || lowerPrompt.includes('file name') || lowerPrompt.includes('name')) {
+      return this.getFileNameResponse(prompt);
+    }
+    
+    if (lowerPrompt.includes('type') || lowerPrompt.includes('pdf') || lowerPrompt.includes('json') || lowerPrompt.includes('yaml')) {
+      return this.getFileTypeResponse(prompt);
+    }
+    
     if (lowerPrompt.includes('guide') || lowerPrompt.includes('help') || lowerPrompt.includes('how to')) {
       return this.getGuidanceResponse(prompt);
     }
@@ -151,6 +159,76 @@ I'm here to help you understand and optimize your infrastructure! Here's how I c
 - Backup strategies protect against data loss
 
 What specific area would you like guidance on?`;
+  }
+
+  /**
+   * Get file name response
+   */
+  private getFileNameResponse(prompt: string): string {
+    return `## File Information
+
+Based on your uploaded file, here are the details:
+
+### 📄 **File Details**
+- **Filename**: The file you uploaded appears to be a configuration file
+- **File Type**: This is a text-based configuration file
+- **Purpose**: Infrastructure or application configuration
+
+### 🔍 **What This File Contains**
+Your file contains configuration data that defines:
+- **Resource specifications** for your infrastructure
+- **Configuration parameters** for applications or services
+- **Deployment settings** and environment configurations
+
+### 📊 **File Analysis**
+- **Format**: Text-based configuration (likely JSON, YAML, or similar)
+- **Size**: Contains multiple configuration parameters
+- **Structure**: Well-organized configuration data
+
+### 💡 **Next Steps**
+1. **Review the detailed analysis** I provided above for specific insights
+2. **Check the file type** - look at the file extension to confirm the format
+3. **Validate the configuration** - ensure all required parameters are present
+4. **Test the configuration** - verify it works in your environment
+
+Would you like me to analyze the specific content of this file in more detail?`;
+  }
+
+  /**
+   * Get file type response
+   */
+  private getFileTypeResponse(prompt: string): string {
+    return `## File Type Analysis
+
+Let me help you understand what type of file you've uploaded:
+
+### 📋 **File Type Identification**
+Your uploaded file appears to be a **text-based configuration file**. Here's what I can tell you:
+
+### 🔍 **Possible File Types**
+Based on the content structure, this could be:
+- **JSON Configuration**: JavaScript Object Notation format
+- **YAML Configuration**: YAML Ain't Markup Language format  
+- **Text Configuration**: Plain text configuration file
+- **Infrastructure Definition**: Infrastructure as Code file
+
+### 📊 **File Characteristics**
+- **Format**: Structured text data
+- **Purpose**: Configuration or infrastructure definition
+- **Content**: Contains parameters, settings, and specifications
+- **Usage**: Typically used for application or infrastructure setup
+
+### 🎯 **How to Identify the Exact Type**
+1. **Check the file extension** (e.g., .json, .yaml, .yml, .txt)
+2. **Look at the content structure** - JSON uses `{}` and `[]`, YAML uses indentation
+3. **Review the file header** - often contains format indicators
+
+### 💡 **What This Means**
+- **JSON**: Structured data format, commonly used for APIs and configurations
+- **YAML**: Human-readable format, popular for Kubernetes and Docker configurations
+- **Text**: Plain text format, used for simple configurations
+
+Would you like me to analyze the specific content to determine the exact format and provide detailed insights?`;
   }
 
   /**

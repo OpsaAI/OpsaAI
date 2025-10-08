@@ -83,44 +83,51 @@ export async function POST(request: NextRequest) {
       );
     }
     
-    // Search for relevant chunks
-    const relevantChunks = searchChunks(fileId, question, 5);
+    // Get file content from vector store
+    const fileData = vectorStore.get(fileId);
     
-    if (relevantChunks.length === 0) {
+    if (!fileData) {
       return NextResponse.json(
-        { error: 'No relevant content found for this file' },
+        { error: 'File not found' },
         { status: 404 }
       );
     }
     
-    // Prepare context from relevant chunks
-    const context = relevantChunks
-      .map((chunk, index) => `[Context ${index + 1}]\n${chunk.text}`)
-      .join('\n\n');
+    // Check if this is a question about the file itself
+    const lowerQuestion = question.toLowerCase();
+    const isFileQuestion = lowerQuestion.includes('file') || 
+                          lowerQuestion.includes('filename') || 
+                          lowerQuestion.includes('type') || 
+                          lowerQuestion.includes('what is') ||
+                          lowerQuestion.includes('analyze') ||
+                          lowerQuestion.includes('explain') ||
+                          lowerQuestion.includes('guide') ||
+                          lowerQuestion.includes('help');
     
-    // System prompt
-    const systemPrompt = `You are OpsaAI, an AI-powered Infra Assistant with 4 tools: Chat, Analyze, Visualize, Logs.
-For now, only Chat is active.
-Help the user analyze uploaded files and answer questions about them.
-
-Context from the uploaded file:
-${context}
+    let aiResponse;
+    
+    if (isFileQuestion) {
+      // Use infrastructure analysis for file-related questions
+      aiResponse = await aiService.analyzeInfrastructure(fileData.content, fileData.filename);
+    } else {
+      // Use chat for general questions
+      const systemPrompt = `You are OpsaAI, an AI-powered Infrastructure Assistant. 
+      
+File: ${fileData.filename}
+Content: ${fileData.content.substring(0, 2000)}...
 
 User Question: ${question}
 
-Please provide a helpful and accurate response based on the context provided. If the question cannot be answered from the context, please say so.`;
-    
-    // Generate response using AI service
-    const aiResponse = await aiService.generateText(systemPrompt, 1000);
+Please provide a helpful response based on the file content.`;
+      
+      aiResponse = await aiService.generateText(systemPrompt, 1000);
+    }
     
     return NextResponse.json({
       success: true,
       answer: aiResponse.content,
-      chunksUsed: relevantChunks.length,
-      context: relevantChunks.map(chunk => ({
-        text: chunk.text.substring(0, 100) + '...',
-        chunkIndex: chunk.chunkIndex,
-      })),
+      filename: fileData.filename,
+      fileType: fileData.filename.split('.').pop(),
       provider: aiResponse.provider,
       isMock: aiResponse.isMock,
     });
