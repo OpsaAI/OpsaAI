@@ -1,0 +1,295 @@
+name: Hacktoberfest 2024
+
+on:
+  issues:
+    types: [opened, labeled, unlabeled]
+  pull_request:
+    types: [opened, labeled, unlabeled, synchronize, closed]
+  schedule:
+    # Run daily at 9 AM UTC during October
+    - cron: '0 9 * 10 *'
+
+env:
+  HACKTOBERFEST_YEAR: 2024
+
+jobs:
+  validate-hacktoberfest:
+    name: Validate Hacktoberfest Contributions
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Validate PR for Hacktoberfest
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { data: pr } = await github.rest.pulls.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.issue.number
+            });
+
+            const { data: files } = await github.rest.pulls.listFiles({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.issue.number
+            });
+
+            // Check if PR is labeled for Hacktoberfest
+            const hacktoberfestLabel = pr.labels.some(label => 
+              label.name.toLowerCase().includes('hacktoberfest')
+            );
+
+            if (!hacktoberfestLabel) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: `🎃 **Hacktoberfest 2024**\n\nThank you for your contribution! To make this PR count for Hacktoberfest, please:\n\n1. Add the \`hacktoberfest\` label to this PR\n2. Ensure your PR follows our [Contributing Guidelines](CONTRIBUTING.md)\n3. Make sure your changes are meaningful and not spam\n\nHappy Hacking! 🚀`
+              });
+            }
+
+            // Check for spam indicators
+            const spamIndicators = [
+              'test', 'testing', 'spam', 'lorem', 'ipsum',
+              'hello world', 'fix typo', 'update readme'
+            ];
+
+            const isSpam = files.some(file => {
+              const filename = file.filename.toLowerCase();
+              const additions = file.additions;
+              const deletions = file.deletions;
+              
+              // Check for minimal changes
+              if (additions < 10 && deletions < 5) {
+                return true;
+              }
+              
+              // Check for spam filenames
+              return spamIndicators.some(indicator => 
+                filename.includes(indicator)
+              );
+            });
+
+            if (isSpam) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: `⚠️ **Hacktoberfest Spam Detection**\n\nThis PR appears to be spam or a low-quality contribution. Please ensure your contribution:\n\n- Adds meaningful value to the project\n- Follows our coding standards\n- Includes proper documentation\n- Has been tested\n\nPlease review our [Contributing Guidelines](CONTRIBUTING.md) and [Code of Conduct](CODE_OF_CONDUCT.md).`
+              });
+              
+              await github.rest.issues.addLabels({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                labels: ['spam', 'invalid']
+              });
+            }
+
+  auto-label-hacktoberfest:
+    name: Auto-label Hacktoberfest Issues
+    runs-on: ubuntu-latest
+    if: github.event_name == 'issues' && github.event.action == 'opened'
+    steps:
+      - name: Check if issue is for Hacktoberfest
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const issue = context.payload.issue;
+            const title = issue.title.toLowerCase();
+            const body = issue.body.toLowerCase();
+            
+            const hacktoberfestKeywords = [
+              'hacktoberfest', 'good first issue', 'beginner',
+              'easy', 'starter', 'newcomer', 'first timer'
+            ];
+            
+            const isHacktoberfest = hacktoberfestKeywords.some(keyword => 
+              title.includes(keyword) || body.includes(keyword)
+            );
+            
+            if (isHacktoberfest) {
+              await github.rest.issues.addLabels({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                labels: ['hacktoberfest', 'good first issue']
+              });
+              
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                body: `🎃 **Hacktoberfest 2024**\n\nGreat! This issue has been labeled for Hacktoberfest. Here's how to contribute:\n\n1. **Fork the repository**\n2. **Create a feature branch** from \`main\`\n3. **Make your changes** following our [Contributing Guidelines](CONTRIBUTING.md)\n4. **Submit a Pull Request** with the \`hacktoberfest\` label\n\n**Resources:**\n- [Contributing Guide](CONTRIBUTING.md)\n- [Code of Conduct](CODE_OF_CONDUCT.md)\n- [Setup Instructions](README.md)\n\nHappy Hacking! 🚀`
+              });
+            }
+
+  generate-hacktoberfest-report:
+    name: Generate Hacktoberfest Report
+    runs-on: ubuntu-latest
+    if: github.event_name == 'schedule'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Generate Hacktoberfest Statistics
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { data: issues } = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'all',
+              labels: 'hacktoberfest',
+              per_page: 100
+            });
+
+            const { data: prs } = await github.rest.pulls.list({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'all',
+              per_page: 100
+            });
+
+            const hacktoberfestPRs = prs.filter(pr => 
+              pr.labels.some(label => 
+                label.name.toLowerCase().includes('hacktoberfest')
+              )
+            );
+
+            const mergedPRs = hacktoberfestPRs.filter(pr => pr.merged_at);
+            const openPRs = hacktoberfestPRs.filter(pr => pr.state === 'open');
+            const closedPRs = hacktoberfestPRs.filter(pr => 
+              pr.state === 'closed' && !pr.merged_at
+            );
+
+            const report = `# 🎃 Hacktoberfest 2024 Report
+
+## 📊 Statistics
+
+- **Total Issues**: ${issues.length}
+- **Total PRs**: ${hacktoberfestPRs.length}
+- **Merged PRs**: ${mergedPRs.length}
+- **Open PRs**: ${openPRs.length}
+- **Closed PRs**: ${closedPRs.length}
+
+## 🏆 Top Contributors
+
+${mergedPRs.slice(0, 10).map((pr, index) => 
+  `${index + 1}. @${pr.user.login} - ${pr.title}`
+).join('\n')}
+
+## 📈 Progress
+
+- **Completion Rate**: ${Math.round((mergedPRs.length / hacktoberfestPRs.length) * 100)}%
+- **Average PR Size**: ${Math.round(hacktoberfestPRs.reduce((acc, pr) => acc + pr.additions + pr.deletions, 0) / hacktoberfestPRs.length)} lines
+
+---
+*Report generated on ${new Date().toISOString().split('T')[0]}*
+`;
+
+            // Create or update the report file
+            const fs = require('fs');
+            const path = require('path');
+            
+            fs.writeFileSync(
+              path.join(process.cwd(), 'HACKTOBERFEST_REPORT.md'),
+              report
+            );
+
+      - name: Commit and push report
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add HACKTOBERFEST_REPORT.md
+          git commit -m "Update Hacktoberfest 2024 report" || exit 0
+          git push
+
+  welcome-new-contributors:
+    name: Welcome New Contributors
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request' && github.event.action == 'opened'
+    steps:
+      - name: Check if contributor is new
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { data: pr } = await github.rest.pulls.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.issue.number
+            });
+
+            const { data: commits } = await github.rest.pulls.listCommits({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.issue.number
+            });
+
+            const contributor = commits[0].author.login;
+            
+            // Check if this is their first contribution
+            const { data: userPRs } = await github.rest.search.issuesAndPullRequests({
+              q: `repo:${context.repo.owner}/${context.repo.repo} author:${contributor} type:pr`,
+              per_page: 1
+            });
+
+            if (userPRs.total_count === 1) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: `🎉 **Welcome to OpsaAI, @${contributor}!**\n\nThank you for your first contribution to our project! We're excited to have you join our community.\n\n**Next Steps:**\n1. Make sure your PR follows our [Contributing Guidelines](CONTRIBUTING.md)\n2. Our maintainers will review your changes soon\n3. Join our [Discord community](https://discord.gg/opsaai) to connect with other contributors\n\n**Resources:**\n- [Code of Conduct](CODE_OF_CONDUCT.md)\n- [Documentation](README.md)\n- [Community Support](https://github.com/OpsaAI/OpsaAI/discussions)\n\nHappy contributing! 🚀`
+              });
+            }
+
+  update-hacktoberfest-badge:
+    name: Update Hacktoberfest Badge
+    runs-on: ubuntu-latest
+    if: github.event_name == 'schedule'
+    steps:
+      - name: Update README with current stats
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { data: prs } = await github.rest.pulls.list({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'all',
+              per_page: 100
+            });
+
+            const hacktoberfestPRs = prs.filter(pr => 
+              pr.labels.some(label => 
+                label.name.toLowerCase().includes('hacktoberfest')
+              )
+            );
+
+            const mergedPRs = hacktoberfestPRs.filter(pr => pr.merged_at);
+            
+            // Update the README with current statistics
+            const fs = require('fs');
+            const path = require('path');
+            
+            let readme = fs.readFileSync(path.join(process.cwd(), 'README.md'), 'utf8');
+            
+            // Update Hacktoberfest statistics in README
+            readme = readme.replace(
+              /\[!\[Hacktoberfest\][^\]]*\]\([^)]*\)/g,
+              `[![Hacktoberfest](https://img.shields.io/badge/Hacktoberfest-${mergedPRs.length}%20PRs%20merged-orange.svg)](https://hacktoberfest.digitalocean.com/)`
+            );
+            
+            fs.writeFileSync(path.join(process.cwd(), 'README.md'), readme);
+
+      - name: Commit updated README
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add README.md
+          git commit -m "Update Hacktoberfest statistics" || exit 0
+          git push
