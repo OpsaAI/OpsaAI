@@ -173,21 +173,30 @@ try {
     console.log('✅ .env file not tracked in git');
   }
   
-  // Check for common secrets patterns
-  const commonSecrets = ['password', 'secret', 'key', 'token'];
+  // Check for common secrets patterns (more specific)
   const allFiles = execSync('git ls-files', { encoding: 'utf8' }).split('\n');
   
   let foundSecrets = false;
   allFiles.forEach(file => {
-    if (file && fs.existsSync(file)) {
+    if (file && fs.existsSync(file) && !file.includes('node_modules') && !file.includes('.git')) {
       try {
         const content = fs.readFileSync(file, 'utf8');
-        commonSecrets.forEach(secret => {
-          if (content.toLowerCase().includes(secret) && 
-              content.includes('=') && 
+        
+        // Look for actual secret patterns (not just words)
+        const secretPatterns = [
+          /password\s*=\s*['"][^'"]{8,}['"]/i,
+          /secret\s*=\s*['"][^'"]{16,}['"]/i,
+          /api_key\s*=\s*['"][^'"]{20,}['"]/i,
+          /token\s*=\s*['"][^'"]{20,}['"]/i
+        ];
+        
+        secretPatterns.forEach(pattern => {
+          if (pattern.test(content) && 
               !content.includes('example') &&
-              !content.includes('placeholder')) {
-            console.log(`⚠️  Potential secret in ${file}: ${secret}`);
+              !content.includes('placeholder') &&
+              !content.includes('your-') &&
+              !content.includes('TODO')) {
+            console.log(`⚠️  Potential secret in ${file}`);
             foundSecrets = true;
           }
         });
