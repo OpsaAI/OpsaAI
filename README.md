@@ -1,46 +1,46 @@
-# 🧠 OpsaAI - AI-Powered Infrastructure Analysis
+# OpsaAI - AI-Powered Infrastructure Analysis
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Hacktoberfest](https://img.shields.io/badge/Hacktoberfest-friendly-orange.svg)](https://hacktoberfest.digitalocean.com/)
+[![Hacktoberfest 2025](https://img.shields.io/badge/Hacktoberfest-2025-orange.svg)](https://hacktoberfest.com/)
 [![Open Source](https://img.shields.io/badge/Open%20Source-Yes-blue.svg)](https://github.com/OpsaAI/OpsaAI)
 
 > AI-powered platform for analyzing cloud infrastructure files with intelligent chat assistance and visualization.
 
-## 🌟 What is OpsaAI?
+![OpsaAI Demo](https://github.com/OpsaAI/OpsaAI/assets/your-username/opsaai-demo.gif)
 
-OpsaAI helps developers analyze their infrastructure files (YAML, JSON, Dockerfile, etc.) using AI. Upload your files, ask questions, and get intelligent insights about your cloud infrastructure.
+## What is OpsaAI?
 
-### 🚀 Key Features
+OpsaAI helps developers analyze their infrastructure files using AI. Upload your files, ask questions, and get intelligent insights about your cloud infrastructure.
 
-- **📁 File Analysis**: Upload and analyze YAML, JSON, Dockerfile, PDF files
-- **💬 AI Chat**: Ask questions about your infrastructure files
-- **📊 Visualization**: See your infrastructure in interactive diagrams
-- **📋 Log Analysis**: AI-powered log file analysis
-- **🔒 Security Insights**: Get security recommendations
+### Key Features
 
-## 🛠️ Tech Stack
+- **File Analysis**: Upload and analyze YAML, JSON, Dockerfile, PDF files
+- **AI Chat**: Ask questions about your infrastructure files
+- **Visualization**: See your infrastructure in interactive diagrams
+- **Log Analysis**: AI-powered log file analysis
+- **Security Insights**: Get security recommendations
 
-- **Next.js 14** + **TypeScript** - Frontend
+## Tech Stack
+
+- **Next.js 15** + **TypeScript** - Frontend
 - **Ollama** - Local AI model (Docker)
 - **ChromaDB** - Vector database (Docker)
 - **Tailwind CSS** - Styling
 
-## 🚀 Quick Start
-
-**New to OpsaAI?** Check out our [Getting Started Guide](GETTING_STARTED.md) for a detailed walkthrough.
+## Quick Start
 
 ### Prerequisites
-- **Node.js 18+**
-- **Docker** (for AI services)
+- Node.js 18+
+- Docker (for AI services)
 
-### Quick Setup
+### Setup
 ```bash
 # Clone and install
 git clone https://github.com/OpsaAI/OpsaAI.git
 cd OpsaAI
 pnpm install
 
-# Setup environment (defaults work fine)
+# Setup environment
 cp env.example .env.local
 
 # Start AI services
@@ -52,13 +52,13 @@ pnpm dev
 
 Open [http://localhost:3000](http://localhost:3000) and start analyzing your infrastructure files!
 
-## 🎯 How to Use
+## How to Use
 
 1. **Upload Files**: Go to `/chat` and upload your infrastructure files
 2. **Ask Questions**: Chat with AI about your uploaded files
 3. **Get Insights**: Receive security, performance, and optimization recommendations
 
-## 📁 Supported File Types
+## Supported File Types
 
 - **YAML/YML** - Kubernetes, Docker Compose, Ansible
 - **JSON** - Configuration files, API specs  
@@ -66,36 +66,54 @@ Open [http://localhost:3000](http://localhost:3000) and start analyzing your inf
 - **PDF** - Documentation and reports
 - **Text** - Logs, scripts, documentation
 
-## 🔧 Development
+## Contributing
 
-### Local Development Setup
-```bash
-# Install dependencies
-pnpm install
+We welcome contributions! Perfect for **Hacktoberfest 2025**.
 
-# Start AI services (Docker)
-./scripts/setup-services.sh
-
-# Start development server
-pnpm dev
-```
-
-### Environment Variables
-Copy `env.example` to `.env.local` and configure:
-- `OLLAMA_BASE_URL` - Ollama service URL (default: http://localhost:11434)
-- `CHROMA_SERVER_HOST` - ChromaDB host (default: localhost)
-- `CHROMA_SERVER_PORT` - ChromaDB port (default: 8000)
-
-## 🤝 Contributing
-
-We welcome contributions! Here's how to get started:
-
-### 🎯 Hacktoberfest 2024
+### Hacktoberfest 2025
 - Look for issues labeled `hacktoberfest` or `good first issue`
 - Fork the repo, make changes, and submit a PR
 - Read our [Contributing Guide](CONTRIBUTING.md)
 
-### Quick Contribution Steps
+### Contribution Areas
+
+#### Frontend Development
+- **UI Components**: Improve existing components or add new ones
+- **Responsive Design**: Make the app work better on mobile/tablet
+- **Dark Mode**: Enhance the dark theme implementation
+- **Accessibility**: Improve keyboard navigation and screen reader support
+
+#### Backend Development
+- **API Routes**: Add new endpoints or improve existing ones
+- **File Processing**: Support for more file types (XML, CSV, etc.)
+- **Error Handling**: Better error messages and validation
+- **Performance**: Optimize database queries and API responses
+
+#### AI & ML Features
+- **Model Integration**: Add support for other AI models
+- **Prompt Engineering**: Improve AI responses and accuracy
+- **Vector Search**: Enhance file search and retrieval
+- **Custom Models**: Add support for custom trained models
+
+#### Documentation
+- **API Documentation**: Add OpenAPI/Swagger documentation
+- **User Guides**: Create step-by-step tutorials
+- **Code Comments**: Improve code documentation
+- **Video Tutorials**: Create demo videos
+
+#### Testing & Quality
+- **Unit Tests**: Add tests for components and utilities
+- **Integration Tests**: Test API endpoints and workflows
+- **E2E Tests**: Add Cypress or Playwright tests
+- **Performance Tests**: Add load testing and optimization
+
+#### DevOps & Infrastructure
+- **Docker**: Improve Docker setup and multi-stage builds
+- **CI/CD**: Add GitHub Actions workflows
+- **Monitoring**: Add logging and error tracking
+- **Deployment**: Add deployment guides for various platforms
+
+### Quick Steps
 1. Fork the repository
 2. Create a branch: `git checkout -b feature/your-feature`
 3. Make your changes
@@ -103,7 +121,7 @@ We welcome contributions! Here's how to get started:
 5. Push: `git push origin feature/your-feature`
 6. Open a Pull Request
 
-## 🏗️ Project Structure
+## Project Structure
 ```
 OpsaAI/
 ├── app/           # Next.js pages and API routes
@@ -113,19 +131,20 @@ OpsaAI/
 └── public/       # Static assets
 ```
 
-## 🧪 Testing
+## Development Commands
 ```bash
-pnpm test        # Run tests
-pnpm lint        # Check code style
+pnpm dev         # Start development server
 pnpm build       # Build for production
+pnpm lint        # Check code style
+pnpm start       # Start production server
 ```
 
-## 📄 License
+## License
 MIT License - see [LICENSE](LICENSE) file
 
-## 📞 Support
+## Support
 - **Issues**: [GitHub Issues](https://github.com/OpsaAI/OpsaAI/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/OpsaAI/OpsaAI/discussions)
+- **Email**: contact51xneeraj@gmail.com
 
 ---
 
