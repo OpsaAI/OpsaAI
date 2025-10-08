@@ -132,26 +132,6 @@ OpsaAI/
 └── public/       # Static assets
 ```
 
-## Deployment Options
-
-### Option 1: Vercel (Recommended for Demo)
-1. **Fork this repository**
-2. **Connect to Vercel**: Import your fork
-3. **Deploy**: Automatic deployment with mock AI
-4. **Result**: Live demo with realistic responses
-
-### Option 2: With Hugging Face AI (Free)
-1. **Get API Key**: Sign up at [Hugging Face](https://huggingface.co/settings/tokens)
-2. **Add Environment Variable**: `HUGGINGFACE_API_KEY=your-key`
-3. **Deploy**: Same as Option 1
-4. **Result**: Full AI features with 30k free requests/month
-
-### Option 3: Local Development (Full Features)
-1. **Install Docker**: For Ollama and ChromaDB
-2. **Run Setup**: `./scripts/setup-services.sh`
-3. **Start App**: `pnpm dev`
-4. **Result**: Complete AI features locally
-
 ## Development Commands
 ```bash
 pnpm dev         # Start development server

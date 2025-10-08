@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { aiService } from '@/lib/ai';
-import { appConfig } from '@/lib/config';
+import { Ollama } from 'ollama';
+
+// Initialize Ollama client
+const ollama = new Ollama({
+  host: 'http://localhost:11434', // Default Ollama host
+});
 
 // Simple vector store simulation (same as upload route)
 // Use global variable to persist data between requests
@@ -83,53 +87,53 @@ export async function POST(request: NextRequest) {
       );
     }
     
-    // Get file content from vector store
-    const fileData = vectorStore.get(fileId);
+    // Search for relevant chunks
+    const relevantChunks = searchChunks(fileId, question, 5);
     
-    if (!fileData) {
+    if (relevantChunks.length === 0) {
       return NextResponse.json(
-        { error: 'File not found' },
+        { error: 'No relevant content found for this file' },
         { status: 404 }
       );
     }
     
-    // Check if this is a question about the file itself
-    const lowerQuestion = question.toLowerCase();
-    const isFileQuestion = lowerQuestion.includes('file') || 
-                          lowerQuestion.includes('filename') || 
-                          lowerQuestion.includes('type') || 
-                          lowerQuestion.includes('what is') ||
-                          lowerQuestion.includes('analyze') ||
-                          lowerQuestion.includes('explain') ||
-                          lowerQuestion.includes('guide') ||
-                          lowerQuestion.includes('help');
+    // Prepare context from relevant chunks
+    const context = relevantChunks
+      .map((chunk, index) => `[Context ${index + 1}]\n${chunk.text}`)
+      .join('\n\n');
     
-    let aiResponse;
-    
-    if (isFileQuestion) {
-      // Use infrastructure analysis for file-related questions
-      aiResponse = await aiService.analyzeInfrastructure(fileData.content, fileData.filename);
-    } else {
-      // Use chat for general questions
-      const systemPrompt = `You are OpsaAI, an AI-powered Infrastructure Assistant. 
-      
-File: ${fileData.filename}
-Content: ${fileData.content.substring(0, 2000)}...
+    // System prompt
+    const systemPrompt = `You are OpsaAI, an AI-powered Infra Assistant with 4 tools: Chat, Analyze, Visualize, Logs.
+For now, only Chat is active.
+Help the user analyze uploaded files and answer questions about them.
+
+Context from the uploaded file:
+${context}
 
 User Question: ${question}
 
-Please provide a helpful response based on the file content.`;
-      
-      aiResponse = await aiService.generateText(systemPrompt, 1000);
-    }
+Please provide a helpful and accurate response based on the context provided. If the question cannot be answered from the context, please say so.`;
+    
+    // Generate response using Ollama
+    const response = await ollama.generate({
+      model: 'llama3',
+      prompt: systemPrompt,
+      stream: false,
+      options: {
+        temperature: 0.7,
+        top_p: 0.9,
+        num_predict: 1000,
+      },
+    });
     
     return NextResponse.json({
       success: true,
-      answer: aiResponse.content,
-      filename: fileData.filename,
-      fileType: fileData.filename.split('.').pop(),
-      provider: aiResponse.provider,
-      isMock: aiResponse.isMock,
+      answer: response.response,
+      chunksUsed: relevantChunks.length,
+      context: relevantChunks.map(chunk => ({
+        text: chunk.text.substring(0, 100) + '...',
+        chunkIndex: chunk.chunkIndex,
+      })),
     });
     
   } catch (error) {
