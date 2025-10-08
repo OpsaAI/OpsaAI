@@ -1,4 +1,4 @@
-# OpsaAI - AI-Powered Infrastructure Analysis
+# OpsaAI - An AI Powered Cloud Infra Buddy
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Hacktoberfest 2025](https://img.shields.io/badge/Hacktoberfest-2025-orange.svg)](https://hacktoberfest.com/)
@@ -74,7 +74,7 @@ We welcome contributions! Perfect for **Hacktoberfest 2025**.
 ### Hacktoberfest 2025
 - Look for issues labeled `hacktoberfest` or `good first issue`
 - Fork the repo, make changes, and submit a PR
-- Read our [Contributing Guide](CONTRIBUTING.md)
+- Read our [Contributing Guide](docs/CONTRIBUTING.md)
 
 ### Contribution Areas
 

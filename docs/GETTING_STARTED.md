@@ -128,7 +128,7 @@ OpsaAI/
 
 - **GitHub Issues**: [Report bugs or ask questions](https://github.com/OpsaAI/OpsaAI/issues)
 - **Discord**: [Join our community](https://discord.gg/opsaai)
-- **Documentation**: Check the [README](README.md) for more details
+- **Documentation**: Check the [README](../README.md) for more details
 
 ---
 

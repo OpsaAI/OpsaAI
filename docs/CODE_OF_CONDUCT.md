@@ -165,7 +165,7 @@ During Hacktoberfest, we expect all participants to:
 ### Learning Resources
 
 * **Contributing Guide**: [CONTRIBUTING.md](CONTRIBUTING.md)
-* **Development Setup**: [README.md](README.md)
+* **Development Setup**: [README.md](../README.md)
 * **API Documentation**: [API Docs](https://docs.opsaai.com/api)
 * **Code Examples**: [Examples](https://github.com/OpsaAI/OpsaAI/tree/main/examples)
 

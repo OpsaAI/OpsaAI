@@ -143,7 +143,7 @@ We thank the following security researchers for their responsible disclosure:
 
 ---
 
-**Last Updated**: October 2024  
+**Last Updated**: October 2025  
 **Next Review**: January 2025
 
 Thank you for helping keep OpsaAI secure! 🛡️

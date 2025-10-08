@@ -33,7 +33,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Security
 - Nothing yet
 
-## [0.1.0] - 2024-10-XX
+## [0.1.0] - 2025-10-XX
 
 ### Added
 - 🎉 **Initial Release** - OpsaAI v0.1.0
@@ -68,7 +68,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Community
 - 🌟 **Open Source** - MIT licensed for community contributions
-- 🎃 **Hacktoberfest 2024** - Participating in Hacktoberfest
+- 🎃 **Hacktoberfest 2025** - Participating in Hacktoberfest
 - 💬 **Discord Community** - Real-time chat and support
 - 📖 **GitHub Discussions** - Community Q&A and feature requests
 - 🐛 **Issue Templates** - Structured bug reports and feature requests
@@ -80,18 +80,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 | Version | Date | Description |
 |---------|------|-------------|
-| 0.1.0 | 2024-10-XX | Initial open-source release with core AI features |
+| 0.1.0 | 2025-10-XX | Initial open-source release with core AI features |
 
 ## Release Notes
 
 ### v0.1.0 - "The Future of Machine Intelligence"
-- **Release Date**: October 2024
+- **Release Date**: October 2025
 - **Tag**: `v0.1.0`
 - **Highlights**: 
   - First public release of OpsaAI
   - Complete AI-powered infrastructure analysis platform
   - Open-source with MIT license
-  - Hacktoberfest 2024 participation
+  - Hacktoberfest 2025 participation
   - Comprehensive documentation and community guidelines
 
 ## Migration Guide

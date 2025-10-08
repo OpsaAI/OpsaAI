@@ -2,7 +2,7 @@
 
 Thank you for contributing to OpsaAI! This guide will help you get started quickly.
 
-## 🎯 Hacktoberfest 2024
+## 🎯 Hacktoberfest 2025
 
 We're participating in Hacktoberfest! Look for issues labeled:
 - `hacktoberfest` - Valid for Hacktoberfest
