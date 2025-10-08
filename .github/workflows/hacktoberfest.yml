@@ -11,6 +11,8 @@ on:
 
 env:
   HACKTOBERFEST_YEAR: 2024
+  NODE_VERSION: '18'
+  PNPM_VERSION: '10'
 
 jobs:
   validate-hacktoberfest:

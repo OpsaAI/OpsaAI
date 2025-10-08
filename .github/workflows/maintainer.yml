@@ -6,6 +6,10 @@ on:
     - cron: '0 9 * * *'
   workflow_dispatch:
 
+env:
+  NODE_VERSION: '18'
+  PNPM_VERSION: '10'
+
 jobs:
   daily-maintenance:
     name: Daily Maintenance Tasks
