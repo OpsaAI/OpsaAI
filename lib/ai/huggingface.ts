@@ -27,7 +27,7 @@ export class HuggingFaceAI {
     }
     
     this.apiKey = appConfig.ai.apiKey;
-    this.model = appConfig.ai.model || 'microsoft/DialoGPT-medium';
+    this.model = appConfig.ai.model || 'gpt2';
     this.baseUrl = appConfig.ai.baseUrl || 'https://api-inference.huggingface.co/models';
   }
 
@@ -57,13 +57,21 @@ export class HuggingFaceAI {
         throw new Error(`Hugging Face API error: ${response.status}`);
       }
 
-      const data: HuggingFaceResponse[] = await response.json();
+      const data = await response.json();
       
-      if (data.length === 0 || !data[0].generated_text) {
-        throw new Error('No response from Hugging Face API');
+      // Handle different response formats
+      if (Array.isArray(data)) {
+        if (data.length === 0 || !data[0].generated_text) {
+          throw new Error('No response from Hugging Face API');
+        }
+        return data[0].generated_text.trim();
+      } else if (data.generated_text) {
+        return data.generated_text.trim();
+      } else if (data.error) {
+        throw new Error(`Hugging Face API error: ${data.error}`);
+      } else {
+        throw new Error('Unexpected response format from Hugging Face API');
       }
-
-      return data[0].generated_text.trim();
     } catch (error) {
       console.error('Hugging Face API error:', error);
       throw error;
