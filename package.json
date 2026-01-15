@@ -41,6 +41,13 @@
     "email": "team@opsaai.com",
     "url": "https://opsaai.com"
   },
+  "contributors": [
+    {
+      "name": "Neeraj Meena",
+      "email": "contact51xneeraj@gmail.com",
+      "url": "https://github.com/your-username"
+    }
+  ],
   "license": "MIT",
   "scripts": {
     "build": "next build",
