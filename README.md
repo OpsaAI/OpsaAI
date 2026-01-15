@@ -31,7 +31,7 @@ OpsaAI helps developers analyze their infrastructure files using AI. Upload your
 ## Quick Start
 
 ### Prerequisites
-- Node.js 18+
+- Node.js 18+ version
 - Ollama (for local AI)
 - Docker (optional, for ChromaDB persistence)
 
